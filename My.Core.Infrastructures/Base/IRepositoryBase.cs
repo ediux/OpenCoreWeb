@@ -8,13 +8,17 @@ namespace My.Core.Infrastructures
 	public interface IRepositoryBase<T>
 		where T : IDataModel
 	{
+		/// <summary>
+		/// Create the specified entity.
+		/// </summary>
+		/// <param name="entity">Entity.</param>
 		T Create(T entity);
 
 		/// <summary>
-		/// 批次建立多筆資料列於資料表
+		/// Batchs the create.
 		/// </summary>
-		/// <param name="entities">包含多個新建資料列的列舉。</param>
-		/// <returns></returns>
+		/// <returns>The create.</returns>
+		/// <param name="entities">Entities.</param>
 		IList<T> BatchCreate(IEnumerable<T> entities);
 
 		/// <summary>

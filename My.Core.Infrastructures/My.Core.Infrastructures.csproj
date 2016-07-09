@@ -33,6 +33,8 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Base\IUnitofWork.cs" />
+    <Compile Include="Base\IRepositoryBase.cs" />
+    <Compile Include="Base\IDataModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />

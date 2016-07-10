@@ -14,7 +14,7 @@ namespace My.Core.Infrastructures
 		/// </summary>
 		/// <returns>The entity.</returns>
 		/// <typeparam name="TDbSet">The 1st type parameter.</typeparam>
-		TDbSet GetEntity<TDbSet>() where TDbSet : class;
+		TDbSet GetEntity<TDbSet>() where TDbSet : IDataModel;
 		/// <summary>
 		/// Begins the transcation.
 		/// </summary>

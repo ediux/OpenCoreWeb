@@ -41,6 +41,7 @@
     <Compile Include="Base\IUnitofWorkWithTSQL.cs" />
     <Compile Include="IoC\IDIHost.cs" />
     <Compile Include="Logs\ILogWriter.cs" />
+    <Compile Include="Base\IServiceBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using My.Core.Infrastructures.Logs;
 
 namespace My.Core.Infrastructures.DAL
 {
@@ -11,6 +12,12 @@ namespace My.Core.Infrastructures.DAL
 	public interface IRepositoryBase<T>
 		where T : IDataModel
 	{
+		/// <summary>
+		/// Gets or sets the logger.
+		/// </summary>
+		/// <value>The logger.</value>
+		ILogWriter Logger { get; set; }
+
 		/// <summary>
 		/// Create the specified entity.
 		/// </summary>

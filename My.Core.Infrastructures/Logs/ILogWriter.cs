@@ -1,5 +1,5 @@
 ﻿using System;
-namespace My.Core.Infrastructures
+namespace My.Core.Infrastructures.Logs
 {
 	/// <summary>
 	/// 定義一組提供系統操作紀錄的統一寫入介面。

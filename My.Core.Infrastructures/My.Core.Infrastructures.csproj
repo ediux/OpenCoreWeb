@@ -42,11 +42,21 @@
     <Compile Include="IoC\IDIHost.cs" />
     <Compile Include="Logs\ILogWriter.cs" />
     <Compile Include="Base\IServiceBase.cs" />
+    <Compile Include="Datas\IAccount.cs" />
+    <Compile Include="Datas\IUserProfile.cs" />
+    <Compile Include="ViewModels\IApplicationUser.cs" />
+    <Compile Include="Datas\IUserOperationLog.cs" />
+    <Compile Include="Datas\IUserOperationCodeDefine.cs" />
+    <Compile Include="Datas\IApplicationRole.cs" />
+    <Compile Include="Datas\IGroup.cs" />
+    <Compile Include="Datas\ApplicationUserBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />
     <Folder Include="IoC\" />
     <Folder Include="Logs\" />
+    <Folder Include="Datas\" />
+    <Folder Include="ViewModels\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -5,6 +5,9 @@ using System.Linq.Expressions;
 
 namespace My.Core.Infrastructures
 {
+	/// <summary>
+	/// Repository base.
+	/// </summary>
 	public interface IRepositoryBase<T>
 		where T : IDataModel
 	{

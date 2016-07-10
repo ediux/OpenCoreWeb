@@ -1,6 +1,9 @@
 ﻿using System;
 namespace My.Core.Infrastructures
 {
+	/// <summary>
+	/// Unitof work.
+	/// </summary>
 	public interface IUnitofWork : IDisposable
 	{
 		/// <summary>

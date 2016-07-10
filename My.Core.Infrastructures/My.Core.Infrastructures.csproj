@@ -40,10 +40,12 @@
     <Compile Include="Base\IDataModel.cs" />
     <Compile Include="Base\IUnitofWorkWithTSQL.cs" />
     <Compile Include="IoC\IDIHost.cs" />
+    <Compile Include="Logs\ILogWriter.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />
     <Folder Include="IoC\" />
+    <Folder Include="Logs\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

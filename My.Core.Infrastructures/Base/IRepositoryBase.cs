@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 
-namespace My.Core.Infrastructures
+namespace My.Core.Infrastructures.DAL
 {
 	/// <summary>
 	/// Repository base.

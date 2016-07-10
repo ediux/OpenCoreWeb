@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace My.Core.Infrastructures
+namespace My.Core.Infrastructures.DAL
 {
 	/// <summary>
 	/// Unit of work with tsql.

@@ -1,5 +1,5 @@
 ﻿using System;
-namespace My.Core.Infrastructures
+namespace My.Core.Infrastructures.DAL
 {
 	/// <summary>
 	/// Unitof work.

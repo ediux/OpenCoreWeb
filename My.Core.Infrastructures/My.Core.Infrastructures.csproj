@@ -39,9 +39,11 @@
     <Compile Include="Base\IRepositoryBase.cs" />
     <Compile Include="Base\IDataModel.cs" />
     <Compile Include="Base\IUnitofWorkWithTSQL.cs" />
+    <Compile Include="IoC\IDIHost.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />
+    <Folder Include="IoC\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

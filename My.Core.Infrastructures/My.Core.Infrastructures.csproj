@@ -49,7 +49,6 @@
     <Compile Include="Datas\IUserOperationCodeDefine.cs" />
     <Compile Include="Datas\IApplicationRole.cs" />
     <Compile Include="Datas\IGroup.cs" />
-    <Compile Include="Datas\ApplicationUserBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />

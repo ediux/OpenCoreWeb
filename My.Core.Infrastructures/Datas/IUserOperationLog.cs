@@ -27,7 +27,7 @@ namespace My.Core.Infrastructures
 		/// 取得或設定紀錄時間。
 		/// </summary>
 		/// <value>The log time.</value>
-		int LogTime { get; set; }
+		DateTime LogTime { get; set; }
 		/// <summary>
 		/// Gets or sets the URL.
 		/// </summary>

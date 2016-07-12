@@ -55,6 +55,8 @@
     <Compile Include="Datas\UserOperationLog.cs" />
     <Compile Include="Datas\ApplicationUserGroup.cs" />
     <Compile Include="Datas\ApplicationUserProfile.cs" />
+    <Compile Include="Repositories\AccountRepository.cs" />
+    <Compile Include="Enums\OperationCodeEnum.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\My.Core.Infrastructures\My.Core.Infrastructures.csproj">
@@ -65,6 +67,8 @@
   <ItemGroup>
     <Folder Include="Datas\" />
     <Folder Include="Repositories\" />
+    <Folder Include="Migrations\" />
+    <Folder Include="Enums\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

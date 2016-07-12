@@ -7,7 +7,7 @@ namespace My.Core.Infrastructures.Implementations
 	/// <summary>
 	/// 使用者操作紀錄表
 	/// </summary>
-	public abstract class UserOperationLog : IUserOperationLog
+	public  class UserOperationLog : IUserOperationLog
 	{
 		public UserOperationLog()
 		{

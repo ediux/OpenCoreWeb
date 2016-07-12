@@ -49,6 +49,7 @@
     <Compile Include="Datas\IUserOperationCodeDefine.cs" />
     <Compile Include="Datas\IApplicationRole.cs" />
     <Compile Include="Datas\IGroup.cs" />
+    <Compile Include="Repositories\IAccountRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />
@@ -56,6 +57,7 @@
     <Folder Include="Logs\" />
     <Folder Include="Datas\" />
     <Folder Include="ViewModels\" />
+    <Folder Include="Repositories\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

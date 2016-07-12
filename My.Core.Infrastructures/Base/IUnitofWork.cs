@@ -19,6 +19,12 @@ namespace My.Core.Infrastructures.DAL
 		/// <typeparam name="TDbSet">The 1st type parameter.</typeparam>
 		TDbSet GetEntity<TDbSet>() where TDbSet : class;
 		/// <summary>
+		/// Gets the repository.
+		/// </summary>
+		/// <returns>The repository.</returns>
+		/// <typeparam name="TEntity">The 1st type parameter.</typeparam>
+		IRepositoryBase<TEntity> GetRepository<TEntity>() where TEntity : IDataModel;
+		/// <summary>
 		/// Begins the transcation.
 		/// </summary>
 		/// <returns>The transcation.</returns>

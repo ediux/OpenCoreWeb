@@ -242,6 +242,7 @@ namespace My.Core.Infrastructures.Implementations
 			{
 				WriteErrorLog(ex);
 				WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Fail, entity);
+				WriteUserOperationLog(OperationCodeEnum.Account_Create_Rollback, entity);
 				throw ex;
 			}
 			finally

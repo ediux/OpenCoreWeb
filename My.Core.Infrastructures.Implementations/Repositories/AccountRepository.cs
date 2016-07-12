@@ -22,7 +22,7 @@ namespace My.Core.Infrastructures.Implementations
 
 		}
 
-		#region HelperFunctions
+		#region Helper Functions
 		/// <summary>
 		/// Resets the database object.
 		/// </summary>
@@ -57,16 +57,22 @@ namespace My.Core.Infrastructures.Implementations
 			{
 				IRepositoryBase<UserOperationLog> useroperationlog = _unitofwork.GetRepository<UserOperationLog>();
 
+				string _url = string.Empty;
+
+				if (System.Web.HttpContext.Current != null)
+				{
+					_url = System.Web.HttpContext.Current.Request.Url.AbsoluteUri;
+				}
 
 				if (User == null)
 				{
 					useroperationlog.Create(new UserOperationLog()
 					{
 						Body = string.Empty,
-						UserId = -1,
+						UserId = GetCurrentLoginedUserId(),
 						LogTime = DateTime.Now,
 						OpreationCode = (int)code,
-						URL = string.Empty
+						URL = _url
 					});
 
 					useroperationlog.SaveChanges();
@@ -76,11 +82,11 @@ namespace My.Core.Infrastructures.Implementations
 					{
 						useroperationlog.Create(new UserOperationLog()
 						{
-							Body = User.UserName,
-							UserId = -1,
+							Body = string.Format("{0};{1};{2}", User.UserName, User.Password, User.PasswordHash),
+							UserId = GetCurrentLoginedUserId(),
 							LogTime = DateTime.Now,
 							OpreationCode = (int)code,
-							URL = string.Empty
+							URL = _url
 						});
 
 					}
@@ -91,7 +97,7 @@ namespace My.Core.Infrastructures.Implementations
 							UserId = -1,
 							LogTime = DateTime.Now,
 							OpreationCode = (int)code,
-							URL = string.Empty
+							URL = _url
 						});
 					}
 					useroperationlog.SaveChanges();
@@ -105,6 +111,17 @@ namespace My.Core.Infrastructures.Implementations
 
 		}
 
+		protected virtual int GetCurrentLoginedUserId()
+		{
+			var founduser= FindUserByLoginAccount(System.Web.HttpContext.Current.User.Identity.Name, true);
+
+			if (founduser != null)
+			{
+				return founduser.Id;
+			}
+
+			return -1;
+		}
 		#endregion
 
 		#region Logger 記錄器
@@ -178,16 +195,24 @@ namespace My.Core.Infrastructures.Implementations
 		{
 			try
 			{
-				GetDatabase();
 				WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, UpdatedUserData);
+
+				_unitofwork.OpenDatabase();
+				_database = GetDatabase();
+
 				IAccount _fetchuser = FindUserById(UpdatedUserData.Id, true);
+
 				if (_fetchuser != null)
 				{
 					_fetchuser.Password = UpdatedUserData.Password;
 					_fetchuser.PasswordHash = UpdatedUserData.PasswordHash;
 					SaveChanges();
+					WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Success, UpdatedUserData);
 				}
-				WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Success, UpdatedUserData);
+				else {
+					WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Fail, UpdatedUserData);
+				}
+
 				return _fetchuser;
 			}
 			catch (Exception ex)
@@ -216,7 +241,7 @@ namespace My.Core.Infrastructures.Implementations
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-				WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_End_Fail, entity);
+				WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Fail, entity);
 				throw ex;
 			}
 			finally

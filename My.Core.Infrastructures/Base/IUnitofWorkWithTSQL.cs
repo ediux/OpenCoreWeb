@@ -10,16 +10,6 @@ namespace My.Core.Infrastructures.DAL
 	/// </summary>
 	public interface IUnitofWorkWithTSQL : IUnitofWork
 	{
-		/// <summary>
-		/// Opens the connection.
-		/// </summary>
-		/// <returns>The connection.</returns>
-		void OpenConnection();
-		/// <summary>
-		/// Closes the connection.
-		/// </summary>
-		/// <returns>The connection.</returns>
-		void CloseConnection();
 
 		/// <summary>
 		/// Executes the function.

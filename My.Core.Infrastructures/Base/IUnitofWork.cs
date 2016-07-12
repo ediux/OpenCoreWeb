@@ -17,7 +17,7 @@ namespace My.Core.Infrastructures.DAL
 		/// </summary>
 		/// <returns>The entity.</returns>
 		/// <typeparam name="TDbSet">The 1st type parameter.</typeparam>
-		TDbSet GetEntity<TDbSet>() where TDbSet : class;
+	 	TDbSet GetEntity<TDbSet>() where TDbSet : class;
 		/// <summary>
 		/// Gets the repository.
 		/// </summary>
@@ -39,6 +39,11 @@ namespace My.Core.Infrastructures.DAL
 		/// </summary>
 		/// <returns>The transcation.</returns>
 		void CommitTranscation();
+		/// <summary>
+		/// Opens the database.
+		/// </summary>
+		/// <returns>The database.</returns>
+		void OpenDatabase();
 		/// <summary>
 		/// Closes the database.
 		/// </summary>

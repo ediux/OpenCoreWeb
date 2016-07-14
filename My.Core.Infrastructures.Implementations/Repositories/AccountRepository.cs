@@ -113,7 +113,7 @@ namespace My.Core.Infrastructures.Implementations
 
 		protected virtual int GetCurrentLoginedUserId()
 		{
-			var founduser= FindUserByLoginAccount(System.Web.HttpContext.Current.User.Identity.Name, true);
+			var founduser = FindUserByLoginAccount(System.Web.HttpContext.Current.User.Identity.Name, true);
 
 			if (founduser != null)
 			{
@@ -121,6 +121,25 @@ namespace My.Core.Infrastructures.Implementations
 			}
 
 			return -1;
+		}
+
+		protected virtual bool GetIsOnline(int memberid)
+		{
+			try
+			{
+				IRepositoryBase<IUserOperationLog> operationlog = _unitofwork.GetRepository<IUserOperationLog>();
+				IUserOperationLog _logdata = operationlog
+					.FindAll()
+					.Where(w => w.UserId == memberid && w.OpreationCode == (int)OperationCodeEnum.Account_Update_End_Success)
+					.OrderByDescending(o => o.LogTime)
+					.FirstOrDefault();
+				return (_logdata.LogTime <= DateTime.Now);
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				return false;
+			}
 		}
 		#endregion
 
@@ -197,19 +216,15 @@ namespace My.Core.Infrastructures.Implementations
 			{
 				WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, UpdatedUserData);
 
-				_unitofwork.OpenDatabase();
-				_database = GetDatabase();
-
 				IAccount _fetchuser = FindUserById(UpdatedUserData.Id, true);
 
 				if (_fetchuser != null)
 				{
-					_fetchuser.Password = UpdatedUserData.Password;
-					_fetchuser.PasswordHash = UpdatedUserData.PasswordHash;
-					SaveChanges();
+					Update(UpdatedUserData);
 					WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Success, UpdatedUserData);
 				}
-				else {
+				else
+				{
 					WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Fail, UpdatedUserData);
 				}
 
@@ -253,72 +268,315 @@ namespace My.Core.Infrastructures.Implementations
 
 		public void Delete(IAccount entity)
 		{
-			throw new NotImplementedException();
+			try
+			{
+
+				WriteUserOperationLog(OperationCodeEnum.Account_Delete_Start, entity);
+				_unitofwork.OpenDatabase();
+				_database = GetDatabase();
+				_unitofwork.BeginTranscation();
+				IAccount founduser = FindUserById(entity.Id, true);
+				_database.Users.Remove((ApplicationUser)founduser);
+				SaveChanges();
+				_unitofwork.CommitTranscation();
+				WriteUserOperationLog(OperationCodeEnum.Account_Delete_End_Success, entity);
+
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				WriteUserOperationLog(OperationCodeEnum.Account_Delete_End_Fail, entity);
+				WriteUserOperationLog(OperationCodeEnum.Account_Delete_Rollback, entity);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public IAccount Find(Expression<Func<IAccount, bool>> predicate)
 		{
-			throw new NotImplementedException();
+			int _memberid = GetCurrentLoginedUserId();
+			IAccount _currentexecutinguser = FindUserById(_memberid, GetIsOnline(_memberid));
+
+			try
+			{
+				WriteUserOperationLog(OperationCodeEnum.Account_Find_Start, _currentexecutinguser);
+
+				IAccount founduser = FindAll().Where(predicate).SingleOrDefault();
+
+				WriteUserOperationLog(OperationCodeEnum.Account_Find_End_Success, _currentexecutinguser);
+
+				return founduser;
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				WriteUserOperationLog(OperationCodeEnum.Accpimt_Find_End_Fail, _currentexecutinguser);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public IQueryable<IAccount> FindAll()
 		{
-			throw new NotImplementedException();
+			try
+			{
+				_unitofwork.OpenDatabase();
+				_database = _unitofwork.GetDatabaseObject<ApplicationDbContext>();
+				return _database.Users.AsQueryable();
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public IList<IAccount> FindAllAccounts()
 		{
-			throw new NotImplementedException();
+			try
+			{
+
+				return FindAll().ToList();
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public IAccount FindByEmail(string email)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				int _currentexecutionuserid = GetCurrentLoginedUserId();
+				IAccount _currentexecutionuser = FindUserById(_currentexecutionuserid, 
+				                                              GetIsOnline(_currentexecutionuserid));
+				WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_Start,
+									  _currentexecutionuser);
+
+				IRepositoryBase<IUserProfile> _userprofile = _unitofwork.GetRepository<IUserProfile>();
+
+				IUserProfile _userprofileitem = _userprofile.FindAll().Where(w => w.Email == email).SingleOrDefault();
+				WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_End_Success, _currentexecutionuser);
+
+				return FindUserById(_userprofileitem.Id, GetIsOnline(_userprofileitem.Id));
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_End_Fail, null);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public IAccount FindUserById(int MemberId, bool isOnline)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				
+				IAccount _founduser = FindAll().Where(w => w.Id == MemberId).SingleOrDefault();
+				WriteUserOperationLog(OperationCodeEnum.Account_FindById_Start,_founduser);
+				if (isOnline)
+				{
+					WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Online, _founduser);
+					WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, _founduser);
+				}
+				else
+				{
+					WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Offline, _founduser);
+				}
+				WriteUserOperationLog(OperationCodeEnum.Account_FindById_End_Success, _founduser);
+				return _founduser;
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public IAccount FindUserByLoginAccount(string LoginAccount, bool IsOnline)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				IAccount _founduser = FindAll().Where(w => w.UserName == LoginAccount).SingleOrDefault();
+				if (IsOnline)
+				{
+					WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Online, _founduser);
+					WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, _founduser);
+				}
+				else
+				{
+					WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Offline, _founduser);
+				}
+				return _founduser;
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public int FindUserIdFromPasswordResetToken(string Token)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				IAccount _founduser = Find(w => w.ResetPasswordToken == Token);
+				return _founduser.Id;
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public bool IsConfirmed(int MemberId)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				IRepositoryBase<IUserProfile> _userprofilerepository = _unitofwork.GetRepository<IUserProfile>();
+				IUserProfile _profiledata = _userprofilerepository.Find(w => w.Id == MemberId &&
+																		(w.EmailConfirmed || w.PhoneNumberConfirmed));
+				IAccount _founduser = Find(w => w.Id == MemberId);
+				return (_userprofilerepository != null) || (_founduser != null);
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public int ResetPasswordWithToken(string Token, string newPassword)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				int _memberid = FindUserIdFromPasswordResetToken(Token);
+				IAccount _founduser = FindUserById(_memberid, GetIsOnline(_memberid));
+				if (_founduser != null)
+				{
+
+					_founduser.Password = newPassword;
+
+					return (int)OperationCodeEnum.Account_ChangePassword_End_Success;
+				}
+				return (int)OperationCodeEnum.Account_ChangePassword_End_Fail;
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public void SaveChanges()
 		{
-			throw new NotImplementedException();
+			if (_database != null)
+				_database.SaveChanges();
+			else
+				_unitofwork.SaveChanges();
 		}
 
 		public IList<IAccount> ToList(IQueryable<IAccount> source)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return source.ToList();
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+
 		}
 
 		public IAccount Update(IAccount entity)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				IAccount _founduser = FindUserById(entity.Id, GetIsOnline(entity.Id));
+				_unitofwork.BeginTranscation();
+				_founduser.DisplayName = entity.DisplayName;
+				_founduser.Password = entity.Password;
+				_founduser.PasswordHash = entity.PasswordHash;
+				_founduser.ResetPasswordToken = entity.ResetPasswordToken;
+				_founduser.SecurityStamp = entity.SecurityStamp;
+				_founduser.TwoFactorEnabled = entity.TwoFactorEnabled;
+				_founduser.UserName = entity.UserName;
+				_founduser.Void = entity.Void;
+				SaveChanges();
+				_unitofwork.CommitTranscation();
+				return FindUserById(entity.Id, true);
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public bool ValidateUser(IAccount UserDataToValidated)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return Find(w => w.UserName == UserDataToValidated.UserName &&
+						 (UserDataToValidated.Password == w.Password || UserDataToValidated.PasswordHash == w.PasswordHash)) != null;
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 	}
 }

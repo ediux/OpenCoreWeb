@@ -58,6 +58,7 @@
     <Compile Include="Datas\ApplicationUserProfile.cs" />
     <Compile Include="Repositories\AccountRepository.cs" />
     <Compile Include="Enums\OperationCodeEnum.cs" />
+    <Compile Include="Repositories\ApplicationRoleRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\My.Core.Infrastructures\My.Core.Infrastructures.csproj">

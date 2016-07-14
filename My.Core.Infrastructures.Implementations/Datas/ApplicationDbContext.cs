@@ -59,12 +59,8 @@ namespace My.Core.Infrastructures.Implementations
 			modelBuilder.Entity<ApplicationUserGroup>()
 						.HasOptional(op => op.ParentGroup)
 						.WithMany(wp => wp.SubGroups)
-						.Map(d => d.MapKey("ParentId"))
+			            .Map(m=>m.MapKey("ParentId"))
 						.WillCascadeOnDelete(false);
-
-			modelBuilder.Entity<ApplicationUser>()
-						.HasRequired(p => p.Profile)
-						.WithOptional(o => o.User);
 
 			base.OnModelCreating(modelBuilder);
 

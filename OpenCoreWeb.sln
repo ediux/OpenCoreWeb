@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Core.Infrastructures", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Core.Infrastructures.Implementations", "My.Core.Infrastructures.Implementations\My.Core.Infrastructures.Implementations.csproj", "{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Core.TestConsole", "My.Core.TestConsole\My.Core.TestConsole.csproj", "{644E22B3-F93D-4C5C-9C53-6CCED9B15943}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -19,6 +21,10 @@ Global
 		{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}.Release|Any CPU.Build.0 = Release|Any CPU
+		{644E22B3-F93D-4C5C-9C53-6CCED9B15943}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{644E22B3-F93D-4C5C-9C53-6CCED9B15943}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{644E22B3-F93D-4C5C-9C53-6CCED9B15943}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{644E22B3-F93D-4C5C-9C53-6CCED9B15943}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		Policies = $0

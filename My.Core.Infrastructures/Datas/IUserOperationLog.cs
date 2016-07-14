@@ -12,7 +12,7 @@ namespace My.Core.Infrastructures
 		/// 取得或設定操作紀錄識別碼。
 		/// </summary>
 		/// <value>The identifier.</value>
-		Guid Id { get; set; }
+		long LogId { get; set; }
 		/// <summary>
 		/// 取得或設定操作代碼。
 		/// </summary>

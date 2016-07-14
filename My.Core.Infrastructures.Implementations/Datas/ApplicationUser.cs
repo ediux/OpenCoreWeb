@@ -34,7 +34,7 @@ namespace My.Core.Infrastructures.Implementations
 		/// <value>The identifier.</value>
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public virtual int Id { get { return _id; } set { _id = value; } }
+		public virtual int MemberId { get { return _id; } set { _id = value; } }
 
 		private string _password;
 		/// <summary>
@@ -100,7 +100,20 @@ namespace My.Core.Infrastructures.Implementations
 		/// <value>The opreation logs.</value>
 		public virtual Collection<UserOperationLog> OpreationLogs { get; set; }
 
-		public virtual ApplicationUserProfile Profile { get; set; }
+		private string _resetpasswordtoken;
+
+		public string ResetPasswordToken
+		{
+			get
+			{
+				return _resetpasswordtoken;
+			}
+
+			set
+			{
+				_resetpasswordtoken = value;
+			}
+		}
 	}
 }
 

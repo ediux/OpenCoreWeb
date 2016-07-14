@@ -13,7 +13,7 @@ namespace My.Core.Infrastructures.Datas
 		/// 取得或設定使用者系統識別碼
 		/// </summary>
 		/// <value>The identifier.</value>
-		int Id { get; set; }
+		int MemberId { get; set; }
 
 		/// <summary>
 		/// Gets or sets the email.

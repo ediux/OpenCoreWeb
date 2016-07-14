@@ -12,7 +12,7 @@ namespace My.Core.Infrastructures.Datas
 		/// 取得或設定使用者系統識別碼。
 		/// </summary>
 		/// <value>The identifier.</value>
-		int Id { get; set; }
+		int MemberId { get; set; }
 
 		/// <summary>
 		/// 使用者登入帳號名稱

@@ -78,7 +78,7 @@ namespace My.Core.Infrastructures.Implementations
 					useroperationlog.SaveChanges();
 				}
 				else {
-					if (User.Id == -1)
+					if (User.MemberId == -1)
 					{
 						useroperationlog.Create(new UserOperationLog()
 						{
@@ -117,7 +117,7 @@ namespace My.Core.Infrastructures.Implementations
 
 			if (founduser != null)
 			{
-				return founduser.Id;
+				return founduser.MemberId;
 			}
 
 			return -1;
@@ -201,7 +201,7 @@ namespace My.Core.Infrastructures.Implementations
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-				WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Rollback, new ApplicationUser() { Id = -1 });
+				WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Rollback, new ApplicationUser() { MemberId = -1 });
 				throw ex;
 			}
 			finally
@@ -216,7 +216,7 @@ namespace My.Core.Infrastructures.Implementations
 			{
 				WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, UpdatedUserData);
 
-				IAccount _fetchuser = FindUserById(UpdatedUserData.Id, true);
+				IAccount _fetchuser = FindUserById(UpdatedUserData.MemberId, true);
 
 				if (_fetchuser != null)
 				{
@@ -275,7 +275,7 @@ namespace My.Core.Infrastructures.Implementations
 				_unitofwork.OpenDatabase();
 				_database = GetDatabase();
 				_unitofwork.BeginTranscation();
-				IAccount founduser = FindUserById(entity.Id, true);
+				IAccount founduser = FindUserById(entity.MemberId, true);
 				_database.Users.Remove((ApplicationUser)founduser);
 				SaveChanges();
 				_unitofwork.CommitTranscation();
@@ -374,7 +374,7 @@ namespace My.Core.Infrastructures.Implementations
 				IUserProfile _userprofileitem = _userprofile.FindAll().Where(w => w.Email == email).SingleOrDefault();
 				WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_End_Success, _currentexecutionuser);
 
-				return FindUserById(_userprofileitem.Id, GetIsOnline(_userprofileitem.Id));
+				return FindUserById(_userprofileitem.MemberId, GetIsOnline(_userprofileitem.MemberId));
 			}
 			catch (Exception ex)
 			{
@@ -393,7 +393,7 @@ namespace My.Core.Infrastructures.Implementations
 			try
 			{
 				
-				IAccount _founduser = FindAll().Where(w => w.Id == MemberId).SingleOrDefault();
+				IAccount _founduser = FindAll().Where(w => w.MemberId == MemberId).SingleOrDefault();
 				WriteUserOperationLog(OperationCodeEnum.Account_FindById_Start,_founduser);
 				if (isOnline)
 				{
@@ -450,7 +450,7 @@ namespace My.Core.Infrastructures.Implementations
 			try
 			{
 				IAccount _founduser = Find(w => w.ResetPasswordToken == Token);
-				return _founduser.Id;
+				return _founduser.MemberId;
 			}
 			catch (Exception ex)
 			{
@@ -468,10 +468,10 @@ namespace My.Core.Infrastructures.Implementations
 			try
 			{
 				IRepositoryBase<IUserProfile> _userprofilerepository = _unitofwork.GetRepository<IUserProfile>();
-				IUserProfile _profiledata = _userprofilerepository.Find(w => w.Id == MemberId &&
+				IUserProfile _profiledata = _userprofilerepository.Find(w => w.MemberId == MemberId &&
 																		(w.EmailConfirmed || w.PhoneNumberConfirmed));
-				IAccount _founduser = Find(w => w.Id == MemberId);
-				return (_userprofilerepository != null) || (_founduser != null);
+				IAccount _founduser = Find(w => w.MemberId == MemberId);
+				return (_profiledata != null) || (_founduser != null);
 			}
 			catch (Exception ex)
 			{
@@ -536,7 +536,7 @@ namespace My.Core.Infrastructures.Implementations
 		{
 			try
 			{
-				IAccount _founduser = FindUserById(entity.Id, GetIsOnline(entity.Id));
+				IAccount _founduser = FindUserById(entity.MemberId, GetIsOnline(entity.MemberId));
 				_unitofwork.BeginTranscation();
 				_founduser.DisplayName = entity.DisplayName;
 				_founduser.Password = entity.Password;
@@ -546,9 +546,10 @@ namespace My.Core.Infrastructures.Implementations
 				_founduser.TwoFactorEnabled = entity.TwoFactorEnabled;
 				_founduser.UserName = entity.UserName;
 				_founduser.Void = entity.Void;
+				_founduser.ResetPasswordToken = entity.ResetPasswordToken;
 				SaveChanges();
 				_unitofwork.CommitTranscation();
-				return FindUserById(entity.Id, true);
+				return FindUserById(entity.MemberId, true);
 			}
 			catch (Exception ex)
 			{

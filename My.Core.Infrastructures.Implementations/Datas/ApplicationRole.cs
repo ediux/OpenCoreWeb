@@ -15,14 +15,15 @@ namespace My.Core.Infrastructures.Implementations
 			_name = string.Empty;
 		}
 
-		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
 		private int _id;
 		/// <summary>
 		/// Gets or sets the identifier.
 		/// </summary>
 		/// <value>The identifier.</value>
-		public virtual int Id { get { return _id; } set { _id = value; } }
+		[Key]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+		public virtual int RoleId { get { return _id; } set { _id = value; } }
 
 		private string _name;
 		/// <summary>

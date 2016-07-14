@@ -12,7 +12,7 @@ namespace My.Core.Infrastructures.Implementations
 		public UserOperationLog()
 		{
 			_body = string.Empty;
-			_id = Guid.NewGuid();
+			_id = -1;
 			_logtime = DateTime.Now;
 			_opreationcode = 0;
 			_url = string.Empty;
@@ -42,15 +42,15 @@ namespace My.Core.Infrastructures.Implementations
 		#endregion
 
 		#region Id
-		private Guid _id;
+		private long _id;
 
 		/// <summary>
 		/// Gets or sets the identifier.
 		/// </summary>
 		/// <value>The identifier.</value>
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public Guid Id
+		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+		public long LogId
 		{
 			get
 			{

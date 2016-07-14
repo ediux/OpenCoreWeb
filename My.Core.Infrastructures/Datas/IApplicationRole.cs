@@ -10,7 +10,7 @@ namespace My.Core.Infrastructures.DAL
 		/// Gets or sets the identifier.
 		/// </summary>
 		/// <value>The identifier.</value>
-		int Id { get; set; }
+		int RoleId { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name.

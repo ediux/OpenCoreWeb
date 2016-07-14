@@ -94,7 +94,7 @@ namespace My.Core.Infrastructures.Implementations
 		private int _id;
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.None)]
-		public int Id
+		public int MemberId
 		{
 			get
 			{
@@ -482,9 +482,7 @@ namespace My.Core.Infrastructures.Implementations
 				_themecssurl = value;
 			}
 		}
-
-		[ForeignKey("Id")]
-		public virtual ApplicationUser User { get; set; }
+			
 	}
 }
 

@@ -26,6 +26,11 @@ namespace My.Core.Infrastructures.Implementations
 			}
 		}
 
+		public void AddUserToRole(int RoleId, int MemberId)
+		{
+			throw new NotImplementedException();
+		}
+
 		public IList<IApplicationRole> BatchCreate(IEnumerable<IApplicationRole> entities)
 		{
 			throw new NotImplementedException();
@@ -47,6 +52,31 @@ namespace My.Core.Infrastructures.Implementations
 		}
 
 		public IQueryable<IApplicationRole> FindAll()
+		{
+			throw new NotImplementedException();
+		}
+
+		public IApplicationRole FindById(int RoleId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IApplicationRole FindByName(string roleName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public IList<IApplicationRole> FindByUser(int MemberId)
+		{
+			throw new NotImplementedException();
+		}
+
+		public bool IsInRole(int MemberId, string roleName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public void RemoveUserFromRole(int RoleId, int MemberId)
 		{
 			throw new NotImplementedException();
 		}

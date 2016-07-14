@@ -54,6 +54,11 @@ namespace My.Core.Infrastructures.Datas
 		/// <value>The void.</value>
 		bool Void { get; set; }
 
+		/// <summary>
+		/// Gets or sets the reset password token.
+		/// </summary>
+		/// <value>The reset password token.</value>
+		string ResetPasswordToken { get; set; }
 	}
 }
 

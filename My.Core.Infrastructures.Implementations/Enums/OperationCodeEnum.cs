@@ -24,6 +24,20 @@ namespace My.Core.Infrastructures.Implementations
 		Account_ChangePassword_End_Success = 18,
 		Account_ChangePassword_End_Fail = 19,
 		Account_ChangePassword_Rollback = 20,
+		Account_Find_Start = 21,
+		Account_Find_End_Success = 22,
+		Accpimt_Find_End_Fail = 23,
+		Account_FLAG_Online = 24,
+		Account_FLAG_Offline = 25,
+		Account_FindByEmail_Start = 26,
+		Account_FindByEmail_End_Success = 27,
+		Account_FindByEmail_End_Fail = 28,
+		Account_FindById_Start = 29,
+		Account_FindById_End_Success = 30,
+		Account_FindById_End_Fail = 31,
+		Account_FindByLoginAccount_Start = 32,
+		Account_FindByLoginAccount_End_Success = 33,
+		Account_FindByLoginAccount_End_Fail = 34,
 		UserDefined = 65535
 	}
 }

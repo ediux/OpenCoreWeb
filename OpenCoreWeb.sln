@@ -1,9 +1,46 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Core.Infrastructures", "My.Core.Infrastructures\My.Core.Infrastructures.csproj", "{D164EB90-EA2E-4BBB-B781-E55635A96A04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.Core.Infrastructures.Implementations", "My.Core.Infrastructures.Implementations\My.Core.Infrastructures.Implementations.csproj", "{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "My.UnitTest", "My.UnitTest\My.UnitTest.csproj", "{C4021A3A-1033-4219-AEB0-62F6718E2F2F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D164EB90-EA2E-4BBB-B781-E55635A96A04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D164EB90-EA2E-4BBB-B781-E55635A96A04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D164EB90-EA2E-4BBB-B781-E55635A96A04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D164EB90-EA2E-4BBB-B781-E55635A96A04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CF6DBDF-3CF6-4647-BDDE-F1260B1EE419}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4021A3A-1033-4219-AEB0-62F6718E2F2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4021A3A-1033-4219-AEB0-62F6718E2F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4021A3A-1033-4219-AEB0-62F6718E2F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4021A3A-1033-4219-AEB0-62F6718E2F2F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		Policies = $0
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.TextStylePolicy = $4
+		$4.FileWidth = 120
+		$4.TabsToSpaces = False
+		$4.inheritsSet = VisualStudio
+		$4.inheritsScope = text/plain
+		description = ?�發?�本??
+		version = 0.1.1
 	EndGlobalSection
 EndGlobal

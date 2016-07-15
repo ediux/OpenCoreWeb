@@ -10,7 +10,7 @@ namespace My.Core.Infrastructures.DAL
 		/// Gets or sets the identifier.
 		/// </summary>
 		/// <value>The identifier.</value>
-		int Id { get; set; }
+		int GroupId { get; set; }
 
 		/// <summary>
 		/// Gets or sets the name.
@@ -28,7 +28,7 @@ namespace My.Core.Infrastructures.DAL
 		/// Gets or sets the parent identifier.
 		/// </summary>
 		/// <value>The parent identifier.</value>
-		int? ParentId { get; set; }
+		//int? ParentId { get; set; }
 
 		/// <summary>
 		/// Gets or sets the right position.

@@ -14,7 +14,7 @@ namespace My.Core.Infrastructures.Implementations
 			_id = -1;
 			_leftpos = 0;
 			_rightpos = 0;
-			_parentid = null;
+			//_parentid = null;
 			_name = string.Empty;
 
 		}
@@ -23,7 +23,7 @@ namespace My.Core.Infrastructures.Implementations
 
 		[Key]
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-		public int Id
+		public int GroupId
 		{
 			get
 			{
@@ -65,21 +65,21 @@ namespace My.Core.Infrastructures.Implementations
 			}
 		}
 
-		private int? _parentid;
+		//private int? _parentid;
 
-		public int? ParentId
-		{
-			get
-			{
-				return _parentid;
-			}
+		//public int? ParentId
+		//{
+		//	get
+		//	{
+		//		return _parentid;
+		//	}
 
-			set
-			{
-				_parentid = value;
+		//	set
+		//	{
+		//		_parentid = value;
 					
-			}
-		}
+		//	}
+		//}
 
 		private int _rightpos;
 

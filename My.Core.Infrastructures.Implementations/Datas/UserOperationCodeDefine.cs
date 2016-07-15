@@ -11,6 +11,8 @@ namespace My.Core.Infrastructures.Implementations
 		{
 			_opreationcode = -1;
 			_description = string.Empty;
+
+            this.Logs = new Collection<UserOperationLog>();
 		}
 		private string _description;
 

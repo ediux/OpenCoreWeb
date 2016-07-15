@@ -17,6 +17,7 @@ namespace My.Core.Infrastructures.Implementations
 			_opreationcode = 0;
 			_url = string.Empty;
 			_userid = -1;
+            this.User = null;
 		}
 
 		#region Body

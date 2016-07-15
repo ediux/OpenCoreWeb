@@ -19,6 +19,10 @@ namespace My.Core.Infrastructures.Implementations
 			_twofactorenabled = false;
 			_username = string.Empty;
 			_void = false;
+
+			Roles = new Collection<Implementations.ApplicationRole>();
+			Groups = new Collection<ApplicationUserGroup>();
+			OpreationLogs = new Collection<UserOperationLog>();
 		}
 		private string _displayname;
 		/// <summary>

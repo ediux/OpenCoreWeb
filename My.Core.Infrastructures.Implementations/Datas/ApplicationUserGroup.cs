@@ -16,7 +16,9 @@ namespace My.Core.Infrastructures.Implementations
 			_rightpos = 0;
 			//_parentid = null;
 			_name = string.Empty;
-
+            this.ParentGroup = null;
+            this.SubGroups = new Collection<ApplicationUserGroup>();
+            this.Users = new Collection<ApplicationUser>();
 		}
 
 		private int _id;

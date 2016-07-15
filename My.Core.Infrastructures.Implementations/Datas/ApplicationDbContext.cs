@@ -7,8 +7,14 @@ namespace My.Core.Infrastructures.Implementations
 	[DbConfigurationType(typeof(MySqlEFConfiguration))]
 	public class ApplicationDbContext : DbContext
 	{
-		public ApplicationDbContext() : base("Name=Web")
+		public ApplicationDbContext() :
+		this(System.Configuration.ConfigurationManager.ConnectionStrings["Web"].ConnectionString)
 		{
+		}
+
+		public ApplicationDbContext(string nameorconnectino) : base(nameorconnectino)
+		{
+			DbConfiguration.SetConfiguration(new MySqlEFConfiguration());
 			base.Configuration.LazyLoadingEnabled = true;
 		}
 
@@ -47,9 +53,9 @@ namespace My.Core.Infrastructures.Implementations
 						});
 
 			modelBuilder.Entity<UserOperationLog>()
-			            .HasRequired(pk => pk.User)
-			            .WithMany(mp=>mp.OpreationLogs)
-			            .HasForeignKey(k => k.UserId);
+						.HasRequired(pk => pk.User)
+						.WithMany(mp => mp.OpreationLogs)
+						.HasForeignKey(k => k.UserId);
 
 			modelBuilder.Entity<UserOperationLog>()
 						.HasRequired(rp => rp.OperationDetail)
@@ -59,7 +65,7 @@ namespace My.Core.Infrastructures.Implementations
 			modelBuilder.Entity<ApplicationUserGroup>()
 						.HasOptional(op => op.ParentGroup)
 						.WithMany(wp => wp.SubGroups)
-			            .Map(m=>m.MapKey("ParentId"))
+						.Map(m => m.MapKey("ParentId"))
 						.WillCascadeOnDelete(false);
 
 			base.OnModelCreating(modelBuilder);

@@ -10,7 +10,8 @@ namespace My.Core.Infrastructures.Implementations.Migrations
     {
         public Configuration()
 		{
-			AutomaticMigrationsEnabled = false;
+			AutomaticMigrationsEnabled = true;
+			AutomaticMigrationDataLossAllowed = true;
 			//SetSqlGenerator("MySql.Data.MySqlClient", new MySqlMigrationSqlGenerator());
 			SetHistoryContextFactory("MySql.Data.MySqlClient", (conn, schema) => new MySqlHistoryContext(conn, schema));
 			CodeGenerator = new MySqlMigrationCodeGenerator();

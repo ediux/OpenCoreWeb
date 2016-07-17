@@ -7,7 +7,7 @@ namespace My.Core.Infrastructures.Implementations
 	/// <summary>
 	/// 使用者操作紀錄表
 	/// </summary>
-	public  class UserOperationLog : IUserOperationLog
+	public class UserOperationLog : IUserOperationLog
 	{
 		public UserOperationLog()
 		{
@@ -17,7 +17,7 @@ namespace My.Core.Infrastructures.Implementations
 			_opreationcode = 0;
 			_url = string.Empty;
 			_userid = -1;
-            this.User = null;
+			_user = new Lazy<ApplicationUser>(() => null);
 		}
 
 		#region Body
@@ -50,7 +50,7 @@ namespace My.Core.Infrastructures.Implementations
 		/// </summary>
 		/// <value>The identifier.</value>
 		[Key]
-		[DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public long LogId
 		{
 			get
@@ -155,8 +155,10 @@ namespace My.Core.Infrastructures.Implementations
 		#endregion
 
 		#region User
+		private Lazy<ApplicationUser> _user;
+
 		[ForeignKey("UserId")]
-		public virtual ApplicationUser User { get; set; }
+		public virtual ApplicationUser User { get { return _user.Value; } set { _user = new Lazy<ApplicationUser>(() => value); } }
 		#endregion
 	}
 }

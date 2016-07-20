@@ -1,8 +1,8 @@
 ﻿using NUnit.Framework;
-using System;
 using System.Collections.ObjectModel;
 using My.Core.Infrastructures.Implementations;
 using System.Linq;
+using System.Reflection;
 
 namespace My.UnitTest
 {
@@ -12,8 +12,38 @@ namespace My.UnitTest
 		private ApplicationDbContext GetDatabase()
 		{
 
-			string _connstr = "server=192.168.11.10;port=3306;database=OpenCoreWeb;uid=ediux;password=!QAZ2wsx";
-			ApplicationDbContext _db = new ApplicationDbContext(_connstr);
+			string _configfilepath = Assembly.GetExecutingAssembly().Location;
+			System.Diagnostics.Debug.Write(_configfilepath);
+			string _connstr = string.Empty;
+
+			var _config = System.Configuration.ConfigurationManager.OpenExeConfiguration(_configfilepath);
+
+			if (_config.ConnectionStrings != null)
+			{
+				_connstr = _config.ConnectionStrings.ConnectionStrings["Web"].ConnectionString;
+			}
+
+			//_configfilepath = _configfilepath + ".config";
+
+			//if (!File.Exists(_configfilepath))
+			//	return null;
+
+			//var appSettings = new NameValueCollection();
+
+			//var doc = XDocument.Load(File.OpenRead(_configfilepath));
+
+			//foreach (XElement element in doc.Element("configuration").Elements("connectionStrings").Elements("add"))
+			//{
+			//	if (element.Name.LocalName == "add")
+			//	{
+			//		var key = element.Attribute("key").Value;
+			//		var value = element.Attribute("value").Value;
+			//		appSettings.Set(key, value);
+			//	}
+
+			//}
+
+			var _db = new ApplicationDbContext(_connstr);
 			return _db;
 		}
 
@@ -25,107 +55,121 @@ namespace My.UnitTest
 
 			_db.Database.CreateIfNotExists();
 
+			var _alldefines = from _g in _db.OperationCodeDefines
+							  select _g;
+
+			if (_alldefines.Any())
+			{
+				foreach (var _define in _alldefines)
+				{
+					_db.OperationCodeDefines.Remove(_define);
+				}
+				_db.SaveChanges();
+			}
+
 			_db.Dispose();
 
 		}
 
 		[Test()]
-		public void TestUserOpearationCodeDefineCase()
+		public void TestUserOpearationCodeDefineCRUDCase()
 		{
 			using (var _db = GetDatabase())
 			{
-				bool _isexists = (from _g in _db.OperationCodeDefines
-								  select _g
-								 ).Any();
+				var _alldefines = from _g in _db.OperationCodeDefines
+								  where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+								  select _g;
+
+				bool _isexists = _alldefines.Any();
 
 				if (_isexists)
 				{
-					for (int code = 0; code < 65535; code++)
+					foreach (var removecode in _alldefines)
 					{
-						var _codedefine = new UserOperationCodeDefine();
-
-						switch (code)
-						{
-							case (int)OperationCodeEnum.Account_BatchCreate_End_Success:
-								_codedefine.Description = "Account_BatchCreate_End_Success";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_BatchCreate_End_Success;
-								break;
-
-							case (int)OperationCodeEnum.Account_BatchCreate_End_Fail:
-								_codedefine.Description = "Account_BatchCreate_End_Fail";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_BatchCreate_End_Fail;
-								break;
-							case (int)OperationCodeEnum.Account_BatchCreate_Rollback:
-								_codedefine.Description = "Account_BatchCreate_Rollback";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_BatchCreate_Rollback;
-								break;
-							case (int)OperationCodeEnum.Account_BatchCreate_Start:
-								_codedefine.Description = "Account_BatchCreate_Start";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_BatchCreate_Start;
-								break;
-
-							case (int)OperationCodeEnum.Account_ChangePassword_End_Fail:
-								_codedefine.Description = "Account_ChangePassword_End_Fail";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_ChangePassword_End_Fail;
-								break;
-
-							case (int)OperationCodeEnum.Account_ChangePassword_End_Success:
-								_codedefine.Description = "Account_ChangePassword_End_Success";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_ChangePassword_End_Success;
-								break;
-							case (int)OperationCodeEnum.Account_ChangePassword_Rollback:
-								_codedefine.Description = "Account_ChangePassword_Rollback";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_ChangePassword_Rollback;
-								break;
-							case (int)OperationCodeEnum.Account_ChangePassword_Start:
-								_codedefine.Description = "Account_ChangePassword_Start";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_ChangePassword_Start;
-								break;
-							case (int)OperationCodeEnum.Account_Create_End_Fail:
-								_codedefine.Description = "Account_Create_End_Fail";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_Create_End_Fail;
-								break;
-							case (int)OperationCodeEnum.Account_Create_End_Success:
-								_codedefine.Description = "Account_Create_End_Success";
-								_codedefine.OpreationCode = (int)OperationCodeEnum.Account_Create_End_Success;
-								break;
-						}
-
-
-						_db.OperationCodeDefines.Add(_codedefine);
+						_db.OperationCodeDefines.Remove(removecode);
 					}
-
 					_db.SaveChanges();
-
-					_isexists = (from _g in _db.OperationCodeDefines								 
-								 select _g
-							 ).Any();
-
-					Assert.IsTrue(_isexists, "操作代碼 Account_BatchCreate_End_Fail 建立失敗！");
 				}
-				else {
-					Assert.Pass();
-				}
+
+				Assert.IsFalse(_isexists, "操作代碼定義已經存在！");
+
+				var _codedefine = new UserOperationCodeDefine();
+
+				_codedefine.Description = "Account_BatchCreate_Start";
+				_codedefine.OpreationCode = (int)OperationCodeEnum.Account_BatchCreate_Start;
+
+				_db.OperationCodeDefines.Add(_codedefine);
+				_db.SaveChanges();
+
+
+
+				//Read
+				_isexists = (from _g in _db.OperationCodeDefines
+							 where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+							 select _g
+						 ).Any();
+
+				Assert.IsTrue(_isexists, "操作代碼 Account_BatchCreate_Start 不存在！");
+
+				//Update
+				var _updateitem = (from _g in _db.OperationCodeDefines
+								   where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+								   select _g
+								  ).SingleOrDefault();
+
+				Assert.IsNotNull(_updateitem, "測試項目遺失！");
+
+
+				_updateitem.Description = "批次創立帳號開始";
+
+				_db.SaveChanges();
+
+				_updateitem = (from _g in _db.OperationCodeDefines
+							   where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+							   select _g
+							  ).SingleOrDefault();
+
+				Assert.IsNotNull(_updateitem, "測試項目遺失！");
+
+				Assert.AreSame("批次創立帳號開始", _updateitem.Description);
+
+				//Delete
+				_db.OperationCodeDefines.Remove(_updateitem);
+				_db.SaveChanges();
+
+				_isexists = (from _g in _db.OperationCodeDefines
+							 where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+							 select _g).Any();
+
+				Assert.IsFalse(_isexists, "測試刪除失敗！");
+				Assert.Pass();
 			}
 		}
 
 		[Test()]
-		public void TestCreateGroupCase()
+		public void TestGroupCRUDCase()
 		{
 			using (var _db = GetDatabase())
 			{
-				bool _isexists = (from _g in _db.Groups
-								  where _g.Name == "Users"
-								  select _g
-								 ).Any();
-
-				Assert.IsFalse(_isexists, "Users 群組已存在！");
+				var existsgroups = from _g in _db.Groups
+								   where _g.Name == "Users"
+								   select _g;
+				bool _isexists = existsgroups.Any();
 
 				if (_isexists)
 				{
-					return;
+					foreach (var removegroup in existsgroups)
+					{
+						removegroup.Users.Clear();
+
+						_db.Groups.Remove(removegroup);
+					}
+					_db.SaveChanges();
 				}
 
+				Assert.IsFalse(_isexists, "Users 群組已存在！");
+
+				//Create
 				var g = new ApplicationUserGroup
 				{
 					ParentGroup = null,
@@ -136,27 +180,78 @@ namespace My.UnitTest
 				g = _db.Groups.Add(g);
 				_db.SaveChanges();
 
+				//Read
 				_isexists = (from _g in _db.Groups
 							 where _g.Name == "Users"
 							 select _g
 								 ).Any();
 
-				Assert.IsTrue(_isexists, "Users 群組建立失敗！");
+				Assert.IsTrue(_isexists, "找不到 Users 群組！");
+
+				//Update
+
+				var currentgroup = (from _g in _db.Groups
+									where _g.Name == "Users"
+									select _g).SingleOrDefault();
+
+				Assert.IsNotNull(currentgroup, "找不到 Users 群組！");
+				currentgroup.Name = "Admins";
+				_db.SaveChanges();
+
+
+				_isexists = (from _g in _db.Groups
+							 where _g.Name == "Admins"
+							 select _g
+								 ).Any();
+
+				Assert.IsTrue(_isexists, "Users 群組名稱變更成 Admins 失敗！");
+
+				//Delete
+				currentgroup = (from _g in _db.Groups
+								where _g.Name == "Admins"
+								select _g).SingleOrDefault();
+
+				Assert.IsNotNull(currentgroup, "找不到 Admins 群組！");
+
+				_db.Groups.Remove(currentgroup);
+				_db.SaveChanges();
+
+				_isexists = (from _g in _db.Groups
+							 where _g.Name == "Admins"
+							 select _g
+								 ).Any();
+
+				Assert.IsFalse(_isexists, "刪除 Admins 群組失敗！");
+				Assert.Pass();
+
 			}
 		}
 
 		[Test()]
-		public void TestCreateRoleCase()
+		public void TestRoleCRUDCase()
 		{
 			using (var _db = GetDatabase())
 			{
-				bool _isexists = (from _g in _db.Roles
+				var existsroles = from _g in _db.Roles
 								  where _g.Name == "Tester"
-								  select _g
-								 ).Any();
+								  select _g;
+
+				bool _isexists = existsroles.Any();
+
+				if (_isexists)
+				{
+					foreach (var removerole in existsroles)
+					{
+						removerole.Users.Clear();
+
+						_db.Roles.Remove(removerole);
+					}
+					_db.SaveChanges();
+				}
 
 				Assert.IsFalse(_isexists, "Tester 角色已存在！");
 
+				//Create
 				var g = new ApplicationRole
 				{
 					Name = "Tester",
@@ -165,33 +260,77 @@ namespace My.UnitTest
 				g = _db.Roles.Add(g);
 				_db.SaveChanges();
 
+				//Read
 				_isexists = (from _g in _db.Roles
 							 where _g.Name == "Tester"
 							 select _g
 								 ).Any();
 
-				Assert.IsTrue(_isexists, "Tester 角色建立失敗！");
+				Assert.IsTrue(_isexists, "找不到 Tester 角色！");
+
+				//Update
+
+				var currentrole = (from _g in _db.Roles
+								   where _g.Name == "Tester"
+								   select _g).SingleOrDefault();
+
+				Assert.IsNotNull(currentrole, "找不到 Tester 角色！");
+				currentrole.Name = "Master";
+				_db.SaveChanges();
+
+
+				_isexists = (from _g in _db.Roles
+							 where _g.Name == "Master"
+							 select _g
+								 ).Any();
+
+				Assert.IsTrue(_isexists, "Tester 角色名稱變更成 Master 失敗！");
+
+				//Delete
+				currentrole = (from _g in _db.Roles
+							   where _g.Name == "Master"
+							   select _g).SingleOrDefault();
+
+				Assert.IsNotNull(currentrole, "找不到 Master 角色！");
+
+				_db.Roles.Remove(currentrole);
+				_db.SaveChanges();
+
+				_isexists = (from _g in _db.Roles
+							 where _g.Name == "Master"
+							 select _g
+								 ).Any();
+
+				Assert.IsFalse(_isexists, "刪除 Master 角色失敗！");
+
+
 			}
+
+
 		}
 
 		[Test()]
-		public void TestCreateUserCase()
+		public void TestUserCRUDCase()
 		{
 			using (var _db = GetDatabase())
 			{
-				bool _isexists = (from _g in _db.Users
-								  where _g.UserName == "Administrator"
-								  select _g
-								 ).Any();
-
-				Assert.IsFalse(_isexists, "使用者Administrator已存在！");
+				var _users = from _g in _db.Users
+							 where _g.UserName == "Administrator"
+							 select _g;
+				bool _isexists = _users.Any();
 
 				if (_isexists)
 				{
-					return;
+					var _user = _users.SingleOrDefault();
+
+					_db.Users.Remove(_user);
+					_db.SaveChanges();
 				}
 
-				var g = new ApplicationUser
+				Assert.IsFalse(_isexists, "使用者Administrator已存在！");
+
+				//Create
+				var _existeduser = new ApplicationUser
 				{
 					UserName = "Administrator",
 					DisplayName = "系統管理員",
@@ -202,234 +341,120 @@ namespace My.UnitTest
 					TwoFactorEnabled = false,
 					Void = false
 				};
+				_existeduser = _db.Users.Add(_existeduser);
 
-				g = _db.Users.Add(g);
+				//g.OpreationLogs.Add(new UserOperationLog()
+				//{
+				//	LogTime = DateTime.Now,
+				//	OpreationCode = (int)OperationCodeEnum.Account_Create_Start,
+				//	UserId = g.MemberId
+				//});
 
 				_db.SaveChanges();
+
+				//Read
+				_existeduser = (from _g in _db.Users
+								where _g.UserName == "Administrator"
+								&& _g.Void == false
+								select _g).SingleOrDefault();
+
+				Assert.IsNotNull(_existeduser, "Administrator 建立失敗！");
+
+				//update
+
+				_existeduser.DisplayName = "Test";
+
+
+				_db.SaveChanges();
+
+				_existeduser = (from _g in _db.Users
+								where _g.UserName == "Administrator"
+								&& _g.Void == false
+								&& _g.DisplayName == "Test"
+								select _g).SingleOrDefault();
+
+				Assert.IsNotNull(_existeduser, "Administrator 修改失敗！");
+
+				//Delete
+
+				_db.Users.Remove(_existeduser);
+				_db.SaveChanges();
+
 
 				_isexists = (from _g in _db.Users
 							 where _g.UserName == "Administrator"
-							 && _g.Void == false
-							 select _g
-								 ).Any();
+							 select _g).Any();
 
-				Assert.IsTrue(_isexists, "Tester 角色建立失敗！");
-			}
+				Assert.IsFalse(_isexists, "Administrator 刪除失敗！");
 
-		}
+				//建立加入角色測試
+				var _adminsrole
+				 = (from _roles in _db.Roles
+					where _roles.Name == "Admins"
+					select _roles).SingleOrDefault();
 
-		[Test()]
-		public void TestUsertoGroupCase()
-		{
-			using (var _db = GetDatabase())
-			{
-				var _founuser = (from _user in _db.Users
-								 where _user.UserName == "Administrator" && _user.Void == false
-								 select _user).SingleOrDefault();
-
-				var _foundgroup = (from _group in _db.Groups
-								   where _group.Name == "Users"
-								   select _group).SingleOrDefault();
-
-				bool _isExists = (_founuser != null && _foundgroup != null);
-
-				Assert.IsTrue(_isExists, "帳號與群組不存在！");
-
-				bool _isAdded = (from _g in _founuser.Groups
-								 where _g.Name == "Users"
-								 select _g).Any();
-
-				Assert.IsFalse(_isAdded, "已經加入群組Users。");
-
-
-				_founuser.Groups.Add(_foundgroup);
-				_db.SaveChanges();
-
-				_isExists = (from _user in _db.Users
-							 from _group in _user.Groups
-							 where _user.UserName == "Administrator" && _user.Void == false
-							 && _group.Name == "Users"
-							 select _user).Any();
-
-				Assert.IsTrue(_isExists, "群組加入失敗！");
-
-			}
-		}
-
-		[Test]
-		public void TestAddUsertoRoleCase()
-		{
-			using (var _db = GetDatabase())
-			{
-				var _founuser = (from _user in _db.Users
-								 where _user.UserName == "Administrator" && _user.Void == false
-								 select _user).SingleOrDefault();
-
-				var _foundgroup = (from _group in _db.Roles
-								   where _group.Name == "Tester"
-								   select _group).SingleOrDefault();
-
-				bool _isExists = (_founuser != null && _foundgroup != null);
-
-				Assert.IsTrue(_isExists, "帳號與角色不存在！");
-
-
-				bool _isAdded = (from _g in _founuser.Roles
-								 where _g.Name == "Tester"
-								 select _g).Any();
-
-				Assert.IsFalse(_isAdded, "已經加入角色Tester。");
-
-				_founuser.Roles.Add(_foundgroup);
-				_db.SaveChanges();
-
-				_isExists = (from _user in _db.Users
-							 from _group in _user.Roles
-							 where _user.UserName == "Administrator" && _user.Void == false
-							 && _group.Name == "Tester"
-							 select _user).Any();
-
-				Assert.IsTrue(_isExists, "角色Tester加入失敗！");
-
-			}
-		}
-
-		[Test]
-		public void TestAddOperationLogByAdministratorCase()
-		{
-			using (var _db = GetDatabase())
-			{
-				var _founuser = (from _user in _db.Users
-								 where _user.UserName == "Administrator" && _user.Void == false
-								 select _user).SingleOrDefault();
-
-				var _foundefine = (from _codedef in _db.OperationCodeDefines
-								   where _codedef.OpreationCode == (int)OperationCodeEnum.Account_FLAG_Online
-								   select _codedef).SingleOrDefault();
-
-				bool _isFoundCode = (_foundefine != null);
-
-				if (_isFoundCode == false)
+				if (_adminsrole == null)
 				{
-					_db.OperationCodeDefines.Add(new UserOperationCodeDefine()
+					var _role = new ApplicationRole()
 					{
-						Description = "使用者已上線",
-						OpreationCode = (int)OperationCodeEnum.Account_FLAG_Online
-					});
+						Name = "Admins"
+					};
 
+					_db.Roles.Add(_role);
 					_db.SaveChanges();
 
-					_foundefine = (from _codedef in _db.OperationCodeDefines
-								   where _codedef.OpreationCode == (int)OperationCodeEnum.Account_FLAG_Online
-								   select _codedef).SingleOrDefault();
-
-					_isFoundCode = (_foundefine != null);
-
-					Assert.IsTrue(_isFoundCode, "操作代碼新增失敗！");
-
+					_adminsrole = (from _roles in _db.Roles
+								   where _roles.Name == "Admins"
+								   select _roles).SingleOrDefault();
 				}
 
-				bool _isExists = (_founuser != null && _isFoundCode);
+				Assert.IsNotNull(_adminsrole, "Admins 角色建立失敗！");
 
-				Assert.IsTrue(_isExists, "帳號與操作代碼不存在！");
+				_existeduser = (from _user in _db.Users
+								where _user.UserName == "Administrator"
+								select _user).SingleOrDefault();
 
-				var _newlog = new UserOperationLog();
-
-				_newlog.Body = "Testing.";
-				_newlog.LogTime = DateTime.Now;
-				_newlog.OpreationCode = _foundefine.OpreationCode;
-				_newlog.URL = "";
-				_newlog.UserId = _founuser.MemberId;
-
-				_founuser.OpreationLogs.Add(_newlog);
-
-				_db.SaveChanges();
-
-				_isExists = (from _user in _db.Users
-							 from _group in _user.OpreationLogs
-							 where _user.UserName == "Administrator" && _user.Void == false
-							 select _user.OpreationLogs).Any();
-
-				Assert.IsTrue(_isExists, "查無LOG！");
-
-			}
-		}
-
-		[Test]
-		public void TestDeleteGroupCase()
-		{
-			using (var _db = GetDatabase())
-			{
-				var _founuser = (from _user in _db.Users
-								 where _user.UserName == "Administrator" && _user.Void == false
-								 select _user).SingleOrDefault();
-
-				bool _isUserExist = (_founuser != null);
-
-				Assert.IsTrue(_isUserExist, "使用者 Administrator 不存在！");
-
-				_founuser.Groups.Clear();
-				_db.SaveChanges();
-
-
-				var _groups = from _g in _db.Groups
-							  select _g;
-
-				if (_groups.Any())
+				if (_existeduser == null)
 				{
-					foreach (var _removeg in _groups)
+					_existeduser = new ApplicationUser()
 					{
-						_db.Groups.Remove(_removeg);
-					}
-					_db.SaveChanges();
+						UserName = "Administrator",
+						DisplayName = "系統管理員",
+						Password = "!QAZ2wsx",
+						PasswordHash = string.Empty,
+						ResetPasswordToken = "",
+						SecurityStamp = "",
+						TwoFactorEnabled = false,
+						Void = false
+					};
 
-#if MYSQL
-					_db.Database.ExecuteSqlCommand("ALTER TABLE AspNetGroups AUTO_INCREMENT = 1");
-#endif
-					Assert.IsFalse(_db.Groups.Any(), "清除群組失敗！");
+					_db.Users.Add(_existeduser);
+					_db.SaveChanges();
 				}
 
-				Assert.Pass();
-			}
-		}
+				_existeduser = (from _user in _db.Users
+								where _user.UserName == "Administrator"
+								select _user).SingleOrDefault();
 
-		[Test]
-		public void TestDeleteRoleCase()
-		{
-			using (var _db = GetDatabase())
-			{
-				var _founuser = (from _user in _db.Users
-								 where _user.UserName == "Administrator" && _user.Void == false
-								 select _user).SingleOrDefault();
+				Assert.IsNotNull(_existeduser, "Administrator 建立失敗！");
 
-				bool _isUserExist = (_founuser != null);
-
-				Assert.IsTrue(_isUserExist, "使用者 Administrator 不存在！");
-
-				_founuser.Roles.Clear();
+				_existeduser.Roles.Add(_adminsrole);
 				_db.SaveChanges();
 
+				_existeduser = (from _user in _db.Users
+								where _user.UserName == "Administrator"
+								select _user).SingleOrDefault();
 
-				var _groups = from _g in _db.Roles
-							  select _g;
+				Assert.IsTrue(_existeduser.Roles.Where(w => w.Name == "Admins").Any(),"加入Admins角色失敗！");
+				                                       
 
-				if (_groups.Any())
-				{
-					foreach (var _removeg in _groups)
-					{
-						_db.Roles.Remove(_removeg);
-					}
-					_db.SaveChanges();
 
-#if MYSQL
-					_db.Database.ExecuteSqlCommand("ALTER TABLE AspNetRoles AUTO_INCREMENT = 1");
-#endif
-					Assert.IsFalse(_db.Roles.Any(), "清除群組失敗！");
-				}
 
-				Assert.Pass();
 			}
+
 		}
+
+
 
 		[TestFixtureTearDown]
 		public void TestFinished()

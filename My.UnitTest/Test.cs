@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using My.Core.Infrastructures.Implementations;
 using System.Linq;
 using System.Reflection;
+using System.Collections.Generic;
 
 namespace My.UnitTest
 {
@@ -76,75 +77,114 @@ namespace My.UnitTest
 		{
 			using (var _db = GetDatabase())
 			{
-				var _alldefines = from _g in _db.OperationCodeDefines
-								  where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
-								  select _g;
+				bool _isexists;
 
-				bool _isexists = _alldefines.Any();
-
-				if (_isexists)
-				{
-					foreach (var removecode in _alldefines)
-					{
-						_db.OperationCodeDefines.Remove(removecode);
-					}
-					_db.SaveChanges();
-				}
-
+				_isexists = Step_CheckOpreationCodeIsExists(_db);
 				Assert.IsFalse(_isexists, "操作代碼定義已經存在！");
 
-				var _codedefine = new UserOperationCodeDefine();
-
-				_codedefine.Description = "Account_BatchCreate_Start";
-				_codedefine.OpreationCode = (int)OperationCodeEnum.Account_BatchCreate_Start;
-
-				_db.OperationCodeDefines.Add(_codedefine);
-				_db.SaveChanges();
-
-
+				//Create
+				Step_AddOpreationCode(_db);
 
 				//Read
-				_isexists = (from _g in _db.OperationCodeDefines
-							 where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
-							 select _g
-						 ).Any();
-
+				_isexists = Step_GetOpreationCode(_db);
 				Assert.IsTrue(_isexists, "操作代碼 Account_BatchCreate_Start 不存在！");
 
 				//Update
-				var _updateitem = (from _g in _db.OperationCodeDefines
-								   where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
-								   select _g
-								  ).SingleOrDefault();
+				UserOperationCodeDefine _updateitem = Step_UpdateOperationCode(_db);
 
 				Assert.IsNotNull(_updateitem, "測試項目遺失！");
 
-
-				_updateitem.Description = "批次創立帳號開始";
-
-				_db.SaveChanges();
-
-				_updateitem = (from _g in _db.OperationCodeDefines
-							   where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
-							   select _g
-							  ).SingleOrDefault();
-
-				Assert.IsNotNull(_updateitem, "測試項目遺失！");
-
-				Assert.AreSame("批次創立帳號開始", _updateitem.Description);
+				Assert.AreSame("批次創立帳號開始", _updateitem.Description, "變更失敗！");
 
 				//Delete
-				_db.OperationCodeDefines.Remove(_updateitem);
-				_db.SaveChanges();
-
-				_isexists = (from _g in _db.OperationCodeDefines
-							 where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
-							 select _g).Any();
+				_isexists = Step_DeleteOpreationCode(_db, _updateitem);
 
 				Assert.IsFalse(_isexists, "測試刪除失敗！");
 				Assert.Pass();
 			}
 		}
+
+		#region Test for OpreationCodeDefine steps
+		static bool Step_CheckOpreationCodeIsExists(ApplicationDbContext _db)
+		{
+			var _alldefines = from _g in _db.OperationCodeDefines
+							  where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+							  select _g;
+
+			bool _isexists = _alldefines.Any();
+
+			Step_RemoveAllOpreationCodes(_db, _alldefines, _isexists);
+
+			return _isexists;
+		}
+
+		static void Step_RemoveAllOpreationCodes(ApplicationDbContext _db, IEnumerable<UserOperationCodeDefine> _alldefines, bool isExists = false)
+		{
+			if (isExists)
+			{
+				foreach (var removecode in _alldefines)
+				{
+					_db.OperationCodeDefines.Remove(removecode);
+				}
+				_db.SaveChanges();
+			}
+		}
+
+		static void Step_AddOpreationCode(ApplicationDbContext _db)
+		{
+			var _codedefine = new UserOperationCodeDefine();
+
+			_codedefine.Description = "Account_BatchCreate_Start";
+			_codedefine.OpreationCode = (int)OperationCodeEnum.Account_BatchCreate_Start;
+
+			_db.OperationCodeDefines.Add(_codedefine);
+			_db.SaveChanges();
+		}
+
+		static bool Step_GetOpreationCode(ApplicationDbContext _db)
+		{
+			bool _isexists = (from _g in _db.OperationCodeDefines
+							  where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+							  select _g
+					 ).Any();
+			
+			return _isexists;
+		}
+
+		static UserOperationCodeDefine Step_UpdateOperationCode(ApplicationDbContext _db)
+		{
+			var _updateitem = (from _g in _db.OperationCodeDefines
+							   where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+							   select _g
+											  ).SingleOrDefault();
+
+			Assert.IsNotNull(_updateitem, "測試項目遺失！");
+
+
+			_updateitem.Description = "批次創立帳號開始";
+
+			_db.SaveChanges();
+			_updateitem = (from _g in _db.OperationCodeDefines
+						   where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+						   select _g
+							  ).SingleOrDefault();
+
+		
+			return _updateitem;
+		}
+
+		static bool Step_DeleteOpreationCode(ApplicationDbContext _db, UserOperationCodeDefine _updateitem)
+		{
+			bool _isexists;
+			_db.OperationCodeDefines.Remove(_updateitem);
+			_db.SaveChanges();
+
+			_isexists = (from _g in _db.OperationCodeDefines
+						 where _g.OpreationCode == (int)OperationCodeEnum.Account_BatchCreate_Start
+						 select _g).Any();
+			return _isexists;
+		}
+		#endregion
 
 		[Test()]
 		public void TestGroupCRUDCase()
@@ -445,8 +485,8 @@ namespace My.UnitTest
 								where _user.UserName == "Administrator"
 								select _user).SingleOrDefault();
 
-				Assert.IsTrue(_existeduser.Roles.Where(w => w.Name == "Admins").Any(),"加入Admins角色失敗！");
-				                                       
+				Assert.IsTrue(_existeduser.Roles.Where(w => w.Name == "Admins").Any(), "加入Admins角色失敗！");
+
 
 
 

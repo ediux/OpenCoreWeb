@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -12,7 +11,7 @@ namespace My.Core.Infrastructures.Implementations
 			_opreationcode = -1;
 			_description = string.Empty;
 
-            this.Logs = new Collection<UserOperationLog>();
+            Logs = new Collection<UserOperationLog>();
 		}
 		private string _description;
 

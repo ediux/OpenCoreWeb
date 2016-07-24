@@ -63,17 +63,13 @@ namespace My.UnitTest
 
 			_db.Database.CreateIfNotExists();
 
-			var _alldefines = from _g in _db.OperationCodeDefines
-							  select _g;
+			Step_CheckOpreationCodeIsExists(_db);
 
-			if (_alldefines.Any())
-			{
-				foreach (var _define in _alldefines)
-				{
-					_db.OperationCodeDefines.Remove(_define);
-				}
-				_db.SaveChanges();
-			}
+			Step_CheckGroupExists(_db);
+
+			Step_CheckRoleIsExists(_db);
+
+			Step_CheckIsHasUsers(_db);
 
 			_db.Dispose();
 
@@ -445,6 +441,7 @@ namespace My.UnitTest
 		#endregion
 		#endregion
 
+		#region Test for User
 		[Test]
 		public void TestUserCRUDCase()
 		{
@@ -492,7 +489,7 @@ namespace My.UnitTest
 
 				Step_TestforUserRemovefromGroup(_db, out _isexists);
 
-				Assert.IsTrue(_isexists, "");
+				Assert.IsTrue(_isexists, "從 Users 群組移除失敗");
 			}
 
 		}
@@ -520,7 +517,6 @@ namespace My.UnitTest
 			var _user = Step_GetUser(_db).SingleOrDefault();
 
 			Assert.IsNotNull(_user, "Administrator 不存在！");
-
 			Step_CreateGroupNamedUsers(_db);
 
 			var _groupforuser = Step_GetGroupWithNamedUsers(_db).SingleOrDefault();
@@ -598,7 +594,6 @@ namespace My.UnitTest
 			_isSuccess = _existeduser.Roles.Where(w => w.Name == "Tester").Any();
 		}
 
-
 		static bool Step_DeleteUser(ApplicationDbContext _db, ApplicationUser _existeduser)
 		{
 			bool _isexists;
@@ -615,24 +610,32 @@ namespace My.UnitTest
 		static ApplicationUser Step_UpdateUser(ApplicationDbContext _db, ApplicationUser _existeduser)
 		{
 			_existeduser.DisplayName = "Test";
-
-
 			_db.SaveChanges();
 
-			_existeduser = (from _g in _db.Users
-							where _g.UserName == "Administrator"
-							&& _g.Void == false
-							&& _g.DisplayName == "Test"
-							select _g).SingleOrDefault();
+			_existeduser = Step_GetUserByDispalyNameAdmin(_db);
 			return _existeduser;
 		}
 
+		static ApplicationUser Step_GetUserByDispalyNameAdmin(ApplicationDbContext _db)
+		{
+			return (from _g in _db.Users
+					where _g.UserName == "Administrator"
+					&& _g.Void == false
+					&& _g.DisplayName == "Test"
+					select _g).SingleOrDefault();
+		}
 		static IQueryable<ApplicationUser> Step_GetUser(ApplicationDbContext _db)
 		{
 			return from _g in _db.Users
 				   where _g.UserName == "Administrator"
 				   && _g.Void == false
 				   select _g;
+		}
+
+		static IQueryable<ApplicationUser> Step_GetAllUser(ApplicationDbContext _db)
+		{
+			return from _allusers in _db.Users
+				   select _allusers;
 		}
 
 		static ApplicationUser Step_CreateUser(ApplicationDbContext _db)
@@ -664,21 +667,23 @@ namespace My.UnitTest
 		static bool Step_CheckIsHasUsers(ApplicationDbContext _db)
 		{
 			bool _isexists;
-			IQueryable<ApplicationUser> _users = Step_GetUser(_db);
+
+			IQueryable<ApplicationUser> _users = Step_GetAllUser(_db);
 
 			_isexists = _users.Any();
 
 			if (_isexists)
 			{
-				var _user = _users.SingleOrDefault();
-
-				_db.Users.Remove(_user);
+				foreach (var _u in _users)
+				{
+					_db.Users.Remove(_u);
+				}
 				_db.SaveChanges();
 			}
 
 			return _isexists;
 		}
-
+		#endregion
 
 
 		[TestFixtureTearDown]

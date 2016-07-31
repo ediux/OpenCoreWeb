@@ -4,6 +4,7 @@ using My.Core.Infrastructures.Implementations;
 using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
+using My.Core.Infrastructures.Implementations.Datas;
 
 namespace My.UnitTest
 {

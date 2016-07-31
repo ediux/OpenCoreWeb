@@ -2,14 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using My.Core.Infrastructures.DAL;
+using My.Core.Infrastructures.Datas;
 using My.Core.Infrastructures.Logs;
 
-namespace My.Core.Infrastructures.Implementations
+namespace My.Core.Infrastructures.Implementations.Repositories
 {
 	public class ApplicationRoleRepository:IApplicationRoleRepository
 	{
-		public ApplicationRoleRepository()
+		public ApplicationRoleRepository(IUnitofWork unitofwork)
 		{
 		}
 

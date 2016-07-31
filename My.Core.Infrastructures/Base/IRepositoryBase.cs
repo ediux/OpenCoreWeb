@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using My.Core.Infrastructures.Logs;
 
-namespace My.Core.Infrastructures.DAL
+namespace My.Core.Infrastructures
 {
 	/// <summary>
 	/// Repository base.

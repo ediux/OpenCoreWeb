@@ -1,7 +1,4 @@
-﻿using System;
-using My.Core.Infrastructures.DAL;
-
-namespace My.Core.Infrastructures.Datas
+﻿namespace My.Core.Infrastructures.Datas
 {
 	/// <summary>
 	/// 定義系統使用者額外設定資訊表

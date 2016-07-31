@@ -2,9 +2,9 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using My.Core.Infrastructures.DAL;
+using My.Core.Infrastructures.Datas;
 
-namespace My.Core.Infrastructures.Implementations
+namespace My.Core.Infrastructures.Implementations.Datas
 {
 	[Table("AspNetGroups")]
 	public class ApplicationUserGroup : IGroup
@@ -16,9 +16,9 @@ namespace My.Core.Infrastructures.Implementations
 			_rightpos = 0;
 			//_parentid = null;
 			_name = string.Empty;
-            this.ParentGroup = null;
-            this.SubGroups = new Collection<ApplicationUserGroup>();
-            this.Users = new Collection<ApplicationUser>();
+			parentgroup = new Lazy<ApplicationUserGroup>(() => null);
+			subgroups = new Lazy<Collection<ApplicationUserGroup>>(()=>new Collection<ApplicationUserGroup>());
+			users = new Lazy<Collection<ApplicationUser>>(() => new Collection<ApplicationUser>());
 		}
 
 		private int _id;
@@ -34,7 +34,7 @@ namespace My.Core.Infrastructures.Implementations
 
 			set
 			{
-				_id =	value;
+				_id = value;
 			}
 		}
 		private int _leftpos;
@@ -79,7 +79,7 @@ namespace My.Core.Infrastructures.Implementations
 		//	set
 		//	{
 		//		_parentid = value;
-					
+
 		//	}
 		//}
 
@@ -98,11 +98,36 @@ namespace My.Core.Infrastructures.Implementations
 			}
 		}
 
-		public virtual ApplicationUserGroup ParentGroup { get; set; }
+		private Lazy<ApplicationUserGroup> parentgroup;
 
-		public virtual Collection<ApplicationUserGroup> SubGroups { get; set; }
+		public virtual ApplicationUserGroup ParentGroup { get { return parentgroup.Value; } set { parentgroup = new Lazy<ApplicationUserGroup>(() => value); } }
 
-		public virtual Collection<ApplicationUser> Users { get; set; }
+		private Lazy<Collection<ApplicationUserGroup>> subgroups;
+
+		public virtual Collection<ApplicationUserGroup> SubGroups
+		{
+			get
+			{
+				return subgroups.Value;
+			}
+			set
+			{
+				subgroups = new Lazy<Collection<ApplicationUserGroup>>(() => value);
+			}
+		}
+
+		private Lazy<Collection<ApplicationUser>> users;
+		public virtual Collection<ApplicationUser> Users
+		{
+			get
+			{
+				return users.Value;
+			}
+			set
+			{
+				users = new Lazy<Collection<ApplicationUser>>(() => value);
+			}
+		}
 	}
 }
 

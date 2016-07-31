@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using My.Core.Infrastructures.DAL;
+﻿using System.Collections.Generic;
+using My.Core.Infrastructures.Datas;
 
 namespace My.Core.Infrastructures
 {

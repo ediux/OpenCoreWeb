@@ -1,8 +1,9 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using My.Core.Infrastructures.Datas;
 
-namespace My.Core.Infrastructures.Implementations
+namespace My.Core.Infrastructures.Implementations.Datas
 {
 	/// <summary>
 	/// 使用者操作紀錄表
@@ -160,6 +161,20 @@ namespace My.Core.Infrastructures.Implementations
 		[ForeignKey("UserId")]
 		public virtual ApplicationUser User { get { return _user.Value; } set { _user = new Lazy<ApplicationUser>(() => value); } }
 		#endregion
+
+		#region Static of Create object Helper function
+		public static IUserOperationLog CreateNew(IUserOperationCodeDefine code,IAccount OpreationUser,string Url="",string Body="")
+		{
+			return new UserOperationLog() {
+				Body = Body,
+				UserId = OpreationUser.MemberId,
+				LogTime = DateTime.Now,
+				OpreationCode = code.OpreationCode,
+				URL = Url
+			};
+		}
+		#endregion
+
 	}
 }
 

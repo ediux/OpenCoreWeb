@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using My.Core.Infrastructures.Datas;
 
-namespace My.Core.Infrastructures.Implementations
+namespace My.Core.Infrastructures.Implementations.Datas
 {
 	[Table("AspNetUsers")]
 	public class ApplicationUser : IAccount
@@ -20,7 +20,7 @@ namespace My.Core.Infrastructures.Implementations
 			_username = string.Empty;
 			_void = false;
 
-			Roles = new Collection<Implementations.ApplicationRole>();
+			Roles = new Collection<ApplicationRole>();
 			Groups = new Collection<ApplicationUserGroup>();
 			OpreationLogs = new Collection<UserOperationLog>();
 		}

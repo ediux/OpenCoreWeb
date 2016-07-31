@@ -1,7 +1,4 @@
-﻿using System;
-using My.Core.Infrastructures.DAL;
-
-namespace My.Core.Infrastructures.Datas
+﻿namespace My.Core.Infrastructures.Datas
 {
 	/// <summary>
 	/// 定義使用者帳號資料表

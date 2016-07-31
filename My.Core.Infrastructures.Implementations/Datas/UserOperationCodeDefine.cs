@@ -1,8 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using My.Core.Infrastructures.Datas;
 
-namespace My.Core.Infrastructures.Implementations
+namespace My.Core.Infrastructures.Implementations.Datas
 {
 	public class UserOperationCodeDefine : IUserOperationCodeDefine
 	{
@@ -11,8 +13,9 @@ namespace My.Core.Infrastructures.Implementations
 			_opreationcode = -1;
 			_description = string.Empty;
 
-            Logs = new Collection<UserOperationLog>();
+			_logs = new Lazy<Collection<UserOperationLog>>(() => new Collection<UserOperationLog>());
 		}
+
 		private string _description;
 
 		/// <summary>
@@ -54,7 +57,19 @@ namespace My.Core.Infrastructures.Implementations
 			}
 		}
 
-		public virtual Collection<UserOperationLog> Logs { get; set; }
+		private Lazy<Collection<UserOperationLog>> _logs;
+
+		public virtual Collection<UserOperationLog> Logs
+		{
+			get
+			{
+				return _logs.Value;
+			}
+			set
+			{
+				_logs = new Lazy<Collection<UserOperationLog>>(() => value);
+			}
+		}
 	}
 }
 

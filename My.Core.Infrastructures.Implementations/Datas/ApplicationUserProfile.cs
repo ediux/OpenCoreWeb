@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using My.Core.Infrastructures.Datas;
 
-namespace My.Core.Infrastructures.Implementations
+namespace My.Core.Infrastructures.Implementations.Datas
 {
 	public class ApplicationUserProfile : IUserProfile
 	{

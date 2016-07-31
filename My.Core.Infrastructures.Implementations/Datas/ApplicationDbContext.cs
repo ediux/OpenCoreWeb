@@ -1,5 +1,5 @@
-﻿using System;
-using System.Data.Entity;
+﻿using System.Data.Entity;
+using My.Core.Infrastructures.Implementations.Datas;
 using MySql.Data.Entity;
 
 namespace My.Core.Infrastructures.Implementations

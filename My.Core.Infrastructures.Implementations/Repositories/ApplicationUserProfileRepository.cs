@@ -9,20 +9,27 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 {
 	public class ApplicationUserProfileRepository : IUserProfileRepository
 	{
+		private IUnitofWork _unitofwork;
+		private ApplicationDbContext _database;
+
 		public ApplicationUserProfileRepository(IUnitofWork unitofwork)
 		{
+			_unitofwork = unitofwork;
+			_database = _unitofwork.GetDatabaseObject<ApplicationDbContext>();
 		}
+
+		private ILogWriter _logger;
 
 		public ILogWriter Logger
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return _logger;
 			}
 
 			set
 			{
-				throw new NotImplementedException();
+				_logger = value;
 			}
 		}
 

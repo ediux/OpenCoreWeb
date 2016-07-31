@@ -12,11 +12,12 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 	{
 		private IUnitofWork _unitofwork;
 		private ApplicationDbContext _database;
-
+		private bool _isBatchMode;
 		public UserOperationCodeDefineRepository(IUnitofWork unitofwork)
 		{
 			_unitofwork = unitofwork;
-
+			_database = null;
+			_isBatchMode = false;
 		}
 
 		private ILogWriter _logger;
@@ -63,15 +64,27 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		public IList<IUserOperationCodeDefine> BatchCreate(IEnumerable<IUserOperationCodeDefine> entities)
 		{
+			List<IUserOperationCodeDefine> _result = new List<IUserOperationCodeDefine>();
 			try
 			{
 				_unitofwork.OpenDatabase();
 				_database = GetDatabase();
+				_isBatchMode = true;
+				_unitofwork.BeginTranscation();
 
+				foreach (var entity in entities)
+				{
+					_result.Add(	Create(entity));
+				}
+
+				SaveChanges();
+
+				return _result;
 			}
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
+				return _result;
 			}
 			finally
 			{
@@ -85,14 +98,47 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			{
 				_unitofwork.OpenDatabase();
 				_database = GetDatabase();
-				_unitofwork.BeginTranscation();
-				_database.OperationCodeDefines.Add((UserOperationCodeDefine)entity);
-				_unitofwork.SaveChanges();
-				_unitofwork.CommitTranscation();
+
+				if (_isBatchMode == false)
+				{
+					_unitofwork.BeginTranscation();
+				}
+
+				entity = _database.OperationCodeDefines.Add((UserOperationCodeDefine)entity);
+
+				if (_isBatchMode == false)
+				{
+					_unitofwork.SaveChanges();
+				}
+
+				return entity;
 			}
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
+				return entity;
+			}
+			finally
+			{
+				if (_isBatchMode == false)
+					_unitofwork.CloseDatabase();
+			}
+		}
+
+		public void Delete(IUserOperationCodeDefine entity)
+		{
+			try
+			{
+				_unitofwork.OpenDatabase();
+				_database = GetDatabase();
+				_unitofwork.BeginTranscation();
+				_database.OperationCodeDefines.Remove(entity as UserOperationCodeDefine);
+				_unitofwork.SaveChanges();
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+
 			}
 			finally
 			{
@@ -100,39 +146,97 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			}
 		}
 
-		public void Delete(IUserOperationCodeDefine entity)
-		{
-			throw new NotImplementedException();
-		}
-
 		public IUserOperationCodeDefine Find(Expression<Func<IUserOperationCodeDefine, bool>> predicate)
 		{
-			throw new NotImplementedException();
+			try
+			{
+
+
+				IUserOperationCodeDefine founddefined = FindAll().Where(predicate).SingleOrDefault();
+
+				return founddefined;
+
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				return null;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public IQueryable<IUserOperationCodeDefine> FindAll()
 		{
-			throw new NotImplementedException();
+			try
+			{
+				_unitofwork.OpenDatabase();
+				_database = GetDatabase();
+
+
+				return (from opreatationcode in _database.OperationCodeDefines
+						select opreatationcode);
+
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				return null;
+			}
+
 		}
 
 		public IUserOperationCodeDefine FindByCode(int code)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				IUserOperationCodeDefine founddefined = Find(w => w.OpreationCode == code);
+
+				return founddefined;
+
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				return null;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public void SaveChanges()
 		{
-			throw new NotImplementedException();
+			_database.SaveChanges();
 		}
 
 		public IList<IUserOperationCodeDefine> ToList(IQueryable<IUserOperationCodeDefine> source)
 		{
-			throw new NotImplementedException();
+			return source.ToList();
 		}
 
 		public IUserOperationCodeDefine Update(IUserOperationCodeDefine entity)
 		{
-			throw new NotImplementedException();
+			try
+			{
+				IUserOperationCodeDefine founddefined = FindByCode(entity.OpreationCode);
+				founddefined.Description = entity.Description;
+				SaveChanges();
+				founddefined = FindByCode(entity.OpreationCode);
+				return founddefined;
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				return entity;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 	}
 }

@@ -61,7 +61,11 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			}
 		}
 
-
+		/// <summary>
+		/// Batchs the create.
+		/// </summary>
+		/// <returns>The create.</returns>
+		/// <param name="entities">Entities.</param>
 		public IList<IUserOperationCodeDefine> BatchCreate(IEnumerable<IUserOperationCodeDefine> entities)
 		{
 			List<IUserOperationCodeDefine> _result = new List<IUserOperationCodeDefine>();
@@ -74,7 +78,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 				foreach (var entity in entities)
 				{
-					_result.Add(	Create(entity));
+					_result.Add(Create(entity));
 				}
 
 				SaveChanges();
@@ -92,6 +96,10 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			}
 		}
 
+		/// <summary>
+		/// Create the specified entity.
+		/// </summary>
+		/// <param name="entity">Entity.</param>
 		public IUserOperationCodeDefine Create(IUserOperationCodeDefine entity)
 		{
 			try
@@ -125,6 +133,10 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			}
 		}
 
+		/// <summary>
+		/// Delete the specified entity.
+		/// </summary>
+		/// <param name="entity">Entity.</param>
 		public void Delete(IUserOperationCodeDefine entity)
 		{
 			try
@@ -146,6 +158,10 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			}
 		}
 
+		/// <summary>
+		/// Find the specified predicate.
+		/// </summary>
+		/// <param name="predicate">Predicate.</param>
 		public IUserOperationCodeDefine Find(Expression<Func<IUserOperationCodeDefine, bool>> predicate)
 		{
 			try
@@ -168,6 +184,10 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			}
 		}
 
+		/// <summary>
+		/// Finds all.
+		/// </summary>
+		/// <returns>The all.</returns>
 		public IQueryable<IUserOperationCodeDefine> FindAll()
 		{
 			try
@@ -188,6 +208,11 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		}
 
+		/// <summary>
+		/// Finds the by code.
+		/// </summary>
+		/// <returns>The by code.</returns>
+		/// <param name="code">Code.</param>
 		public IUserOperationCodeDefine FindByCode(int code)
 		{
 			try
@@ -208,16 +233,28 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			}
 		}
 
+		/// <summary>
+		/// Saves the changes.
+		/// </summary>
 		public void SaveChanges()
 		{
 			_database.SaveChanges();
 		}
 
+		/// <summary>
+		/// Tos the list.
+		/// </summary>
+		/// <returns>The list.</returns>
+		/// <param name="source">Source.</param>
 		public IList<IUserOperationCodeDefine> ToList(IQueryable<IUserOperationCodeDefine> source)
 		{
 			return source.ToList();
 		}
 
+		/// <summary>
+		/// Update the specified entity.
+		/// </summary>
+		/// <param name="entity">Entity.</param>
 		public IUserOperationCodeDefine Update(IUserOperationCodeDefine entity)
 		{
 			try

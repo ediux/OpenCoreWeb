@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Data.Entity;
-using System.Reflection;
 using My.Core.Infrastructures.Implementations.Repositories;
 
 namespace My.Core.Infrastructures.Implementations
@@ -21,8 +20,7 @@ namespace My.Core.Infrastructures.Implementations
 
 		public void BeginTranscation()
 		{
-			_transaction = _database.Database.BeginTransaction(System.Data.IsolationLevel.ReadCommitted);
-			_usedtransaction = true;
+			//for LINQtoSQL & EF 不需要實作交易因為已經隱含包含了
 		}
 
 		public void CloseDatabase()
@@ -33,30 +31,7 @@ namespace My.Core.Infrastructures.Implementations
 
 		public void CommitTranscation()
 		{
-			if (_usedtransaction)
-			{
-				if (_repositories.Count > 1)
-				{
-					foreach (Type key in _repositories.Keys)
-					{
-						try
-						{
-							object _repositoryvalue = _repositories[key];
-							MethodInfo _method = key.GetMethod("SaveChanges");
-							_method.Invoke(_repositoryvalue, new object[] { });
-						}
-						catch
-						{
-							_transaction.Rollback();
-							continue;
-						}
-
-					}
-				}
-				_transaction.Commit();
-
-				_usedtransaction = false;
-			}
+			
 		}
 
 		public TDb GetDatabaseObject<TDb>() where TDb : class
@@ -155,18 +130,10 @@ namespace My.Core.Infrastructures.Implementations
 			try
 			{
 				_database.SaveChanges();
-
-				if (_usedtransaction)
-				{
-					CommitTranscation();
-				}
 			}
 			catch
 			{
-				if (_usedtransaction)
-				{
-					_transaction.Rollback();
-				}
+				throw;
 			}
 
 		}

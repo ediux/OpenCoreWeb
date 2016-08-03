@@ -17,12 +17,13 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		private DbSet<ApplicationUser> _database;
 
+		private bool isbatchmode;
 		public AccountRepository(IUnitofWork unitofwork)
 		{
 			_unitofwork = unitofwork;
 			_database = _unitofwork.GetEntity<DbSet<ApplicationUser>>();
 			_logger = null;
-
+			isbatchmode = false;
 		}
 
 		#region Helper Functions
@@ -141,67 +142,67 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			return System.Web.Security.Membership.GeneratePassword(12, 1);
 		}
 
-		/// <summary>
-		/// Writes the user operation log.
-		/// </summary>
-		/// <returns>The user operation log.</returns>
-		/// <param name="code">Code.</param>
-		/// <param name="User">User.</param>
-		protected virtual void WriteUserOperationLog(OperationCodeEnum code, IAccount User)
-		{
-			try
-			{
+			///// <summary>
+			///// Writes the user operation log.
+			///// </summary>
+			///// <returns>The user operation log.</returns>
+			///// <param name="code">Code.</param>
+			///// <param name="User">User.</param>
+			//protected virtual void WriteUserOperationLog(OperationCodeEnum code, IAccount User)
+			//{
+			//	try
+			//	{
 
-				IUserOperationLogRepository useroperationlog = _unitofwork.GetRepository<UserOperationLog>() as IUserOperationLogRepository;
-				IUserOperationCodeDefineRepository useropreationrepository = _unitofwork.GetRepository<UserOperationCodeDefine>() as IUserOperationCodeDefineRepository;
+			//		IUserOperationLogRepository useroperationlog = _unitofwork.GetRepository<UserOperationLog>() as IUserOperationLogRepository;
+			//		IUserOperationCodeDefineRepository useropreationrepository = _unitofwork.GetRepository<UserOperationCodeDefine>() as IUserOperationCodeDefineRepository;
 
-				string _url = string.Empty;
-				StringBuilder _bodybuilder = new StringBuilder();
-				_url = GetLogData(_url, _bodybuilder);
+			//		string _url = string.Empty;
+			//		StringBuilder _bodybuilder = new StringBuilder();
+			//		_url = GetLogData(_url, _bodybuilder);
 
-				var operationcodeobject = useropreationrepository.FindByCode((int)code);
+			//		var operationcodeobject = useropreationrepository.FindByCode((int)code);
 
-				IUserOperationLog _newlogrecord =
-					UserOperationLog.CreateNew(
-						operationcodeobject,
-						User,
-						_url,
-						_bodybuilder.ToString());
+			//		IUserOperationLog _newlogrecord =
+			//			UserOperationLog.CreateNew(
+			//				operationcodeobject,
+			//				User,
+			//				_url,
+			//				_bodybuilder.ToString());
 
-				useroperationlog.Create(_newlogrecord);
+			//		useroperationlog.Create(_newlogrecord);
 
-			}
-			catch (Exception ex)
-			{
-				WriteErrorLog(ex);
-			}
+			//	}
+			//	catch (Exception ex)
+			//	{
+			//		WriteErrorLog(ex);
+			//	}
 
-		}
+			//}
 
-		/// <summary>
-		/// Gets the log data.
-		/// </summary>
-		/// <returns>The log data.</returns>
-		/// <param name="_url">URL.</param>
-		/// <param name="_bodybuilder">Bodybuilder.</param>
-		protected virtual string GetLogData(string _url, StringBuilder _bodybuilder)
-		{
-			if (System.Web.HttpContext.Current != null)
-			{
-				_url = System.Web.HttpContext.Current.Request.Url.AbsoluteUri;
+			///// <summary>
+			///// Gets the log data.
+			///// </summary>
+			///// <returns>The log data.</returns>
+			///// <param name="_url">URL.</param>
+			///// <param name="_bodybuilder">Bodybuilder.</param>
+			//protected virtual string GetLogData(string _url, StringBuilder _bodybuilder)
+			//{
+			//	if (System.Web.HttpContext.Current != null)
+			//	{
+			//		_url = System.Web.HttpContext.Current.Request.Url.AbsoluteUri;
 
-				if (System.Web.HttpContext.Current.Request.Form.HasKeys())
-				{
-					foreach (string _key in System.Web.HttpContext.Current.Request.Form.Keys)
-					{
-						_bodybuilder.Append(string.Format("{0}={1};", _key, System.Web.HttpContext.Current.Request.Form[_key]));
-					}
-				}
+			//		if (System.Web.HttpContext.Current.Request.Form.HasKeys())
+			//		{
+			//			foreach (string _key in System.Web.HttpContext.Current.Request.Form.Keys)
+			//			{
+			//				_bodybuilder.Append(string.Format("{0}={1};", _key, System.Web.HttpContext.Current.Request.Form[_key]));
+			//			}
+			//		}
 
-			}
+			//	}
 
-			return _url;
-		}
+			//	return _url;
+			//}
 
 		/// <summary>
 		/// Gets the current logined user identifier.
@@ -268,7 +269,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 				List<IAccount> _insertednewuserlist = new List<IAccount>();
 
 				_unitofwork.BeginTranscation();
-
+				isbatchmode = true;
 				foreach (IAccount newuser in entities)
 				{
 					try
@@ -277,20 +278,18 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 					}
 					catch (Exception ex)
 					{
-						WriteErrorLog(ex);
-						WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_End_Fail, newuser);
+						WriteErrorLog(ex);					
 					}
 
 				}
-
+				isbatchmode = false;
+				SaveChanges();
 				_unitofwork.CommitTranscation();
-
 				return _insertednewuserlist;
 			}
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-				WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Rollback, new ApplicationUser() { MemberId = -1 });
 				throw ex;
 			}
 			finally
@@ -540,7 +539,10 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		public void SaveChanges()
 		{
-			_unitofwork.SaveChanges();
+			if (isbatchmode == false)
+			{
+				_unitofwork.SaveChanges();
+			}
 		}
 
 		public IList<IAccount> ToList(IQueryable<IAccount> source)

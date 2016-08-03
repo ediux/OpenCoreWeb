@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using My.Core.Infrastructures.Datas;
@@ -12,12 +13,18 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 	{
 		private IUnitofWork _unitofwork;
 
-		private ApplicationDbContext _database;
+		private DbSet<ApplicationUserGroup> _database;
+
+		private IAccountRepository accountrepository;
+
+		private bool isbatchmode;
 
 		public ApplicationGroupRepository(IUnitofWork unitofwork)
 		{
 			_unitofwork = unitofwork;
-			_database = unitofwork.GetDatabaseObject<ApplicationDbContext>();
+			_database = unitofwork.GetEntity<DbSet<ApplicationUserGroup>>();
+			accountrepository = unitofwork.GetRepository<AccountRepository>();
+			isbatchmode = false;
 		}
 
 		private ILogWriter _logger;
@@ -39,9 +46,9 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		/// Resets the database object.
 		/// </summary>
 		/// <returns>The database object.</returns>
-		protected virtual ApplicationDbContext GetDatabase()
+		protected virtual DbSet<ApplicationUserGroup> GetDatabase()
 		{
-			return _unitofwork.GetDatabaseObject<ApplicationDbContext>();
+			return _unitofwork.GetEntity<DbSet<ApplicationUserGroup>>();
 		}
 
 		/// <summary>
@@ -61,7 +68,6 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		{
 			try
 			{
-				IAccountRepository accountrepository = _unitofwork.GetRepository<IAccount>() as IAccountRepository;
 				ApplicationUser founduser = accountrepository.FindUserByLoginAccount(username, false) as ApplicationUser;
 				IGroup foundgroup = (from g in FindAll()
 									 where g.Name == groupname
@@ -88,20 +94,20 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 				List<IGroup> resultset = new List<IGroup>();
 				_unitofwork.OpenDatabase();
 				_unitofwork.BeginTranscation();
+				isbatchmode = true;
 				foreach (IGroup entity in entities)
 				{
 					resultset.Add(Create(entity));
 				}
+				isbatchmode = false;
+				SaveChanges();
 				_unitofwork.CommitTranscation();
 				return resultset;
 			}
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-
-				_unitofwork.SaveChanges();
-
-				return new List<IGroup>();
+				return entities.ToList();
 			}
 			finally
 			{
@@ -116,8 +122,8 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 				_unitofwork.OpenDatabase();
 				_database = GetDatabase();
 				_unitofwork.BeginTranscation();
-				IGroup newgroup = _database.Groups.Add(entity as ApplicationUserGroup);
-				_unitofwork.SaveChanges();
+				IGroup newgroup = _database.Add(entity as ApplicationUserGroup);
+				SaveChanges();
 				_unitofwork.CommitTranscation();
 				return newgroup;
 			}
@@ -138,11 +144,9 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			{
 				IGroup grouptoremove = FindAll().Where(w => w.Name == entity.Name).Single();
 
-				_unitofwork.OpenDatabase();
-				_database = GetDatabase();
 				_unitofwork.BeginTranscation();
 
-				_database.Groups.Remove(grouptoremove);
+				_database.Remove((ApplicationUserGroup)grouptoremove);
 
 				_unitofwork.SaveChanges();
 				_unitofwork.CommitTranscation();
@@ -181,7 +185,10 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		public void SaveChanges()
 		{
-			throw new NotImplementedException();
+			if (isbatchmode == false)
+			{
+				_unitofwork.SaveChanges();
+			}
 		}
 
 		public IList<IGroup> ToList(IQueryable<IGroup> source)

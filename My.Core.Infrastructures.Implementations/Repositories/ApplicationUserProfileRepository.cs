@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using My.Core.Infrastructures.Datas;
+using My.Core.Infrastructures.Implementations.Datas;
 using My.Core.Infrastructures.Logs;
 
 namespace My.Core.Infrastructures.Implementations.Repositories
@@ -10,12 +12,12 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 	public class ApplicationUserProfileRepository : IUserProfileRepository
 	{
 		private IUnitofWork _unitofwork;
-		private ApplicationDbContext _database;
+		private DbSet<ApplicationUserProfile> _database;
 
 		public ApplicationUserProfileRepository(IUnitofWork unitofwork)
 		{
 			_unitofwork = unitofwork;
-			_database = _unitofwork.GetDatabaseObject<ApplicationDbContext>();
+			_database = _unitofwork.GetEntity<DbSet<ApplicationUserProfile>>();
 		}
 
 		private ILogWriter _logger;
@@ -30,6 +32,28 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			set
 			{
 				_logger = value;
+			}
+		}
+
+		/// <summary>
+		/// Resets the database object.
+		/// </summary>
+		/// <returns>The database object.</returns>
+		protected virtual DbSet<ApplicationUserProfile> GetDatabase()
+		{
+			return _unitofwork.GetEntity<DbSet<ApplicationUserProfile>>();
+		}
+
+		/// <summary>
+		/// Writes the error log.
+		/// </summary>
+		/// <returns>The error log.</returns>
+		/// <param name="ex">Ex.</param>
+		protected virtual void WriteErrorLog(Exception ex)
+		{
+			if (_logger != null)
+			{
+				_logger.ErrorFormat("{0},{1}", ex.Message, ex.StackTrace);
 			}
 		}
 
@@ -65,7 +89,15 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		public IQueryable<IUserProfile> FindAll()
 		{
-			throw new NotImplementedException();
+			try
+			{
+				return _database.AsQueryable();
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				return null;
+			}
 		}
 
 		public int FindUserIdByEmail(string email)
@@ -105,7 +137,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		public void SaveChanges()
 		{
-			throw new NotImplementedException();
+			_unitofwork.SaveChanges();
 		}
 
 		public void SetCustomFieldValue(string FieldName)

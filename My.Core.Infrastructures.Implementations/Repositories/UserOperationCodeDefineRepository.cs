@@ -197,8 +197,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 				_database = GetDatabase();
 
 
-				return (from opreatationcode in _database.OperationCodeDefines
-						select opreatationcode);
+				return _database.AsQueryable();
 
 			}
 			catch (Exception ex)
@@ -239,7 +238,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		/// </summary>
 		public void SaveChanges()
 		{
-			_database.SaveChanges();
+			_unitofwork.SaveChanges();
 		}
 
 		/// <summary>

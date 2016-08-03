@@ -63,12 +63,7 @@ namespace My.Core.Infrastructures
 		/// <param name="newPassword">New password.</param>
 		int ResetPasswordWithToken(string Token, string newPassword);
 
-		/// <summary>
-		/// Finds the by email.
-		/// </summary>
-		/// <returns>The by email.</returns>
-		/// <param name="email">Email.</param>
-		IAccount FindByEmail(string email);
+	
 	}
 }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using My.Core.Infrastructures.Datas;
@@ -11,12 +12,12 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 	public class UserOperationCodeDefineRepository : IUserOperationCodeDefineRepository
 	{
 		private IUnitofWork _unitofwork;
-		private ApplicationDbContext _database;
+		private DbSet<UserOperationCodeDefine> _database;
 		private bool _isBatchMode;
 		public UserOperationCodeDefineRepository(IUnitofWork unitofwork)
 		{
 			_unitofwork = unitofwork;
-			_database = null;
+			_database = _unitofwork.GetEntity<DbSet<UserOperationCodeDefine>>();
 			_isBatchMode = false;
 		}
 
@@ -43,9 +44,9 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		/// Resets the database object.
 		/// </summary>
 		/// <returns>The database object.</returns>
-		protected virtual ApplicationDbContext GetDatabase()
+		protected virtual DbSet<UserOperationCodeDefine> GetDatabase()
 		{
-			return _unitofwork.GetDatabaseObject<ApplicationDbContext>();
+			return _unitofwork.GetEntity<DbSet<UserOperationCodeDefine>>();
 		}
 
 		/// <summary>
@@ -112,11 +113,11 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 					_unitofwork.BeginTranscation();
 				}
 
-				entity = _database.OperationCodeDefines.Add((UserOperationCodeDefine)entity);
+				entity = _database.Add((UserOperationCodeDefine)entity);
 
 				if (_isBatchMode == false)
 				{
-					_unitofwork.SaveChanges();
+					SaveChanges(); 
 				}
 
 				return entity;
@@ -144,8 +145,8 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 				_unitofwork.OpenDatabase();
 				_database = GetDatabase();
 				_unitofwork.BeginTranscation();
-				_database.OperationCodeDefines.Remove(entity as UserOperationCodeDefine);
-				_unitofwork.SaveChanges();
+				_database.Remove(entity as UserOperationCodeDefine);
+				SaveChanges();
 			}
 			catch (Exception ex)
 			{

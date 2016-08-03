@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Security.Cryptography;
@@ -14,12 +15,12 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 	{
 		private IUnitofWork _unitofwork;
 
-		private ApplicationDbContext _database;
+		private DbSet<ApplicationUser> _database;
 
 		public AccountRepository(IUnitofWork unitofwork)
 		{
 			_unitofwork = unitofwork;
-			_unitofwork.GetDatabaseObject<ApplicationDbContext>();
+			_database = _unitofwork.GetEntity<DbSet<ApplicationUser>>();
 			_logger = null;
 
 		}
@@ -78,9 +79,9 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		/// Resets the database object.
 		/// </summary>
 		/// <returns>The database object.</returns>
-		protected virtual ApplicationDbContext GetDatabase()
+		protected virtual DbSet<ApplicationUser> GetDatabase()
 		{
-			return _unitofwork.GetDatabaseObject<ApplicationDbContext>();
+			return _unitofwork.GetEntity<DbSet<ApplicationUser>>();
 		}
 
 		/// <summary>
@@ -166,7 +167,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 						User,
 						_url,
 						_bodybuilder.ToString());
-				
+
 				useroperationlog.Create(_newlogrecord);
 
 			}
@@ -222,7 +223,8 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		{
 			try
 			{
-				IRepositoryBase<IUserOperationLog> operationlog = _unitofwork.GetRepository<IUserOperationLog>();
+				IUserOperationLogRepository operationlog = _unitofwork.GetRepository<UserOperationLogRepository>();
+
 				IUserOperationLog _logdata = operationlog
 					.FindAll()
 					.Where(w => w.UserId == memberid && w.OpreationCode == (int)OperationCodeEnum.Account_Update_End_Success)
@@ -265,17 +267,13 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			{
 				List<IAccount> _insertednewuserlist = new List<IAccount>();
 
-				_unitofwork.OpenDatabase();
-
-				_database = GetDatabase();
-
 				_unitofwork.BeginTranscation();
 
 				foreach (IAccount newuser in entities)
 				{
 					try
 					{
-						_insertednewuserlist.Add(Create(newuser));
+						Create(newuser);
 					}
 					catch (Exception ex)
 					{
@@ -302,30 +300,18 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		}
 
 		public IAccount ChangePassword(IAccount UpdatedUserData)
-		{ 
+		{
 			try
 			{
-				_unitofwork.OpenDatabase();
-				_database = GetDatabase();
-
-				WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, UpdatedUserData);
-
 				IAccount _fetchuser = FindUserById(UpdatedUserData.MemberId, true);
 
 				if (_fetchuser != null)
 				{
-					_unitofwork.BeginTranscation();
+
 					_fetchuser.Password = UpdatedUserData.Password;
 					_fetchuser.PasswordHash = HashedPassword(UpdatedUserData.Password);
 
 					Update(UpdatedUserData);
-					_unitofwork.CommitTranscation();
-
-					WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Success, UpdatedUserData);
-				}
-				else
-				{
-					WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Fail, UpdatedUserData);
 				}
 
 				return _fetchuser;
@@ -333,7 +319,6 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-				WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Fail, UpdatedUserData);
 				throw ex;
 			}
 			finally
@@ -347,18 +332,16 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			try
 			{
 				_unitofwork.OpenDatabase();
-				_database = _unitofwork.GetDatabaseObject<ApplicationDbContext>();
-				WriteUserOperationLog(OperationCodeEnum.Account_Create_Start, entity);
-				ApplicationUser inserteduser = _database.Users.Add((ApplicationUser)entity);
+				_database = GetDatabase();
+
+				ApplicationUser inserteduser = _database.Add((ApplicationUser)entity);
 				SaveChanges();
-				WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Success, inserteduser);
+
 				return inserteduser;
 			}
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-				WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Fail, entity);
-				WriteUserOperationLog(OperationCodeEnum.Account_Create_Rollback, entity);
 				throw ex;
 			}
 			finally
@@ -372,22 +355,20 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			try
 			{
 				_unitofwork.OpenDatabase();
-				_database = _unitofwork.GetDatabaseObject<ApplicationDbContext>();
-				WriteUserOperationLog(OperationCodeEnum.Account_Delete_Start, entity);
 				_database = GetDatabase();
+
 				_unitofwork.BeginTranscation();
-				IAccount founduser = FindUserById(entity.MemberId, true);
-				_database.Users.Remove((ApplicationUser)founduser);
+
+				_database.Remove((ApplicationUser)entity);
 				SaveChanges();
+
 				_unitofwork.CommitTranscation();
-				WriteUserOperationLog(OperationCodeEnum.Account_Delete_End_Success, entity);
+
 
 			}
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-				WriteUserOperationLog(OperationCodeEnum.Account_Delete_End_Fail, entity);
-				WriteUserOperationLog(OperationCodeEnum.Account_Delete_Rollback, entity);
 				throw ex;
 			}
 			finally
@@ -398,23 +379,15 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		public IAccount Find(Expression<Func<IAccount, bool>> predicate)
 		{
-			int _memberid = GetCurrentLoginedUserId();
-			IAccount _currentexecutinguser = FindUserById(_memberid, GetIsOnline(_memberid));
-
 			try
 			{
-				WriteUserOperationLog(OperationCodeEnum.Account_Find_Start, _currentexecutinguser);
-
 				IAccount founduser = FindAll().Where(predicate).SingleOrDefault();
-
-				WriteUserOperationLog(OperationCodeEnum.Account_Find_End_Success, _currentexecutinguser);
-
 				return founduser;
 			}
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-				WriteUserOperationLog(OperationCodeEnum.Accpimt_Find_End_Fail, _currentexecutinguser);
+
 				throw ex;
 			}
 			finally
@@ -428,8 +401,8 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			try
 			{
 				_unitofwork.OpenDatabase();
-				_database = _unitofwork.GetDatabaseObject<ApplicationDbContext>();
-				return _database.Users.AsQueryable();
+				_database = GetDatabase();
+				return _database.AsQueryable();
 			}
 			catch (Exception ex)
 			{
@@ -446,41 +419,11 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		{
 			try
 			{
-
 				return FindAll().ToList();
 			}
 			catch (Exception ex)
 			{
 				WriteErrorLog(ex);
-				throw ex;
-			}
-			finally
-			{
-				_unitofwork.CloseDatabase();
-			}
-		}
-
-		public IAccount FindByEmail(string email)
-		{
-			try
-			{
-				int _currentexecutionuserid = GetCurrentLoginedUserId();
-				IAccount _currentexecutionuser = FindUserById(_currentexecutionuserid,
-															  GetIsOnline(_currentexecutionuserid));
-				WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_Start,
-									  _currentexecutionuser);
-
-				IRepositoryBase<IUserProfile> _userprofile = _unitofwork.GetRepository<IUserProfile>();
-
-				IUserProfile _userprofileitem = _userprofile.FindAll().Where(w => w.Email == email).SingleOrDefault();
-				WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_End_Success, _currentexecutionuser);
-
-				return FindUserById(_userprofileitem.MemberId, GetIsOnline(_userprofileitem.MemberId));
-			}
-			catch (Exception ex)
-			{
-				WriteErrorLog(ex);
-				WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_End_Fail, null);
 				throw ex;
 			}
 			finally
@@ -495,17 +438,6 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			{
 
 				IAccount _founduser = FindAll().Where(w => w.MemberId == MemberId).SingleOrDefault();
-				WriteUserOperationLog(OperationCodeEnum.Account_FindById_Start, _founduser);
-				if (isOnline)
-				{
-					WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Online, _founduser);
-					WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, _founduser);
-				}
-				else
-				{
-					WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Offline, _founduser);
-				}
-				WriteUserOperationLog(OperationCodeEnum.Account_FindById_End_Success, _founduser);
 				return _founduser;
 			}
 			catch (Exception ex)
@@ -524,15 +456,6 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			try
 			{
 				IAccount _founduser = FindAll().Where(w => w.UserName == LoginAccount).SingleOrDefault();
-				if (IsOnline)
-				{
-					WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Online, _founduser);
-					WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, _founduser);
-				}
-				else
-				{
-					WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Offline, _founduser);
-				}
 				return _founduser;
 			}
 			catch (Exception ex)
@@ -568,11 +491,15 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		{
 			try
 			{
-				IRepositoryBase<IUserProfile> _userprofilerepository = _unitofwork.GetRepository<IUserProfile>();
-				IUserProfile _profiledata = _userprofilerepository.Find(w => w.MemberId == MemberId &&
-																		(w.EmailConfirmed || w.PhoneNumberConfirmed));
-				IAccount _founduser = Find(w => w.MemberId == MemberId);
-				return (_profiledata != null) || (_founduser != null);
+				IAccount _founduser = FindUserById(MemberId, true);
+
+				if (_founduser == null)
+				{
+					return false;
+				}
+
+				return !_founduser.Void;
+
 			}
 			catch (Exception ex)
 			{
@@ -613,10 +540,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		public void SaveChanges()
 		{
-			if (_database != null)
-				_database.SaveChanges();
-			else
-				_unitofwork.SaveChanges();
+			_unitofwork.SaveChanges();
 		}
 
 		public IList<IAccount> ToList(IQueryable<IAccount> source)

@@ -17,13 +17,13 @@ namespace My.Core.Infrastructures
 		/// </summary>
 		/// <returns>The entity.</returns>
 		/// <typeparam name="TDbSet">The 1st type parameter.</typeparam>
-	 	TDbSet GetEntity<TDbSet>() where TDbSet : class;
+		TDbSet GetEntity<TDbSet>() where TDbSet : class;
 		/// <summary>
 		/// Gets the repository.
 		/// </summary>
 		/// <returns>The repository.</returns>
 		/// <typeparam name="TEntity">The 1st type parameter.</typeparam>
-		IRepositoryBase<TEntity> GetRepository<TEntity>() where TEntity : IDataModel;
+		TRepository GetRepository<TRepository>() where TRepository : class;
 		/// <summary>
 		/// Begins the transcation.
 		/// </summary>

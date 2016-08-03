@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Data.Entity;
 using System.Reflection;
+using My.Core.Infrastructures.Implementations.Repositories;
 
 namespace My.Core.Infrastructures.Implementations
 {
@@ -60,37 +61,85 @@ namespace My.Core.Infrastructures.Implementations
 
 		public TDb GetDatabaseObject<TDb>() where TDb : class
 		{
-			return _database as TDb;
+			if (typeof(TDb).BaseType == typeof(DbContext))
+			{
+				return _database as TDb;
+			}
+			else {
+				return null;
+			}
 		}
 
 		public TDbSet GetEntity<TDbSet>() where TDbSet : class
 		{
+			if (typeof(TDbSet) != typeof(DbSet<>))
+			{
+				throw new Exception("Type is not DbSet<>.");
+			}
+
 			OpenDatabase();
 
 			return _database.Set<TDbSet>() as TDbSet;
 		}
 
-		public IRepositoryBase<TEntity> GetRepository<TEntity>() where TEntity : IDataModel
+		public TRepository GetRepository<TRepository>() where TRepository : class
 		{
 			if (_repositories == null)
 			{
 				_repositories = new Hashtable();
 			}
 
-			var type = typeof(TEntity).Name;
+
+			var type = typeof(TRepository).Name;
+
 
 			if (!_repositories.ContainsKey(type))
 			{
-				var repositoryType = typeof(IRepositoryBase<>);
+				if (typeof(TRepository) is IAccountRepository)
+				{
+					var repositoryInstance = new AccountRepository(this);
+					_repositories.Add(type, repositoryInstance);
+					return repositoryInstance as TRepository;
+				}
 
-				var repositoryInstance =
-					Activator.CreateInstance(repositoryType
-											 .MakeGenericType(typeof(TEntity)), _database);
+				if (typeof(TRepository) is IApplicationRoleRepository)
+				{
+					var repositoryInstance = new ApplicationRoleRepository(this);
+					_repositories.Add(type, repositoryInstance);
+					return repositoryInstance as TRepository;
+				}
 
-				_repositories.Add(type, repositoryInstance);
+
+				if (typeof(TRepository) is IGroupRepository)
+				{
+					var repositoryInstance = new ApplicationGroupRepository(this);
+					_repositories.Add(type, repositoryInstance);
+					return repositoryInstance as TRepository;
+				}
+
+				if (typeof(TRepository) is IUserProfileRepository)
+				{
+					var repositoryInstance = new ApplicationUserProfileRepository(this);
+					_repositories.Add(type, repositoryInstance);
+					return repositoryInstance as TRepository;
+				}
+
+				if (typeof(TRepository) is IUserOperationCodeDefineRepository)
+				{
+					var repositoryInstance = new UserOperationCodeDefineRepository(this);
+					_repositories.Add(type, repositoryInstance);
+					return repositoryInstance as TRepository;
+				}
+
+				if (typeof(TRepository) is IUserOperationLogRepository)
+				{
+					var repositoryInstance = new UserOperationLogRepository(this);
+					_repositories.Add(type, repositoryInstance);
+					return repositoryInstance as TRepository;
+				}
 			}
 
-			return (IRepositoryBase<TEntity>)_repositories[type];
+			return (TRepository)_repositories[type];
 		}
 
 		public void OpenDatabase()
@@ -105,12 +154,11 @@ namespace My.Core.Infrastructures.Implementations
 		{
 			try
 			{
+				_database.SaveChanges();
+
 				if (_usedtransaction)
 				{
 					CommitTranscation();
-				}
-				else {
-					_database.SaveChanges();
 				}
 			}
 			catch

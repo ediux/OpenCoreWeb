@@ -204,41 +204,20 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			//	return _url;
 			//}
 
-		/// <summary>
-		/// Gets the current logined user identifier.
-		/// </summary>
-		/// <returns>The current logined user identifier.</returns>
-		protected virtual int GetCurrentLoginedUserId()
-		{
-			var founduser = FindUserByLoginAccount(System.Web.HttpContext.Current.User.Identity.Name, true);
 
-			if (founduser != null)
-			{
-				return founduser.MemberId;
-			}
 
-			return -1;
-		}
-
-		protected virtual bool GetIsOnline(int memberid)
-		{
-			try
-			{
-				IUserOperationLogRepository operationlog = _unitofwork.GetRepository<UserOperationLogRepository>();
-
-				IUserOperationLog _logdata = operationlog
-					.FindAll()
-					.Where(w => w.UserId == memberid && w.OpreationCode == (int)OperationCodeEnum.Account_Update_End_Success)
-					.OrderByDescending(o => o.LogTime)
-					.FirstOrDefault();
-				return (_logdata.LogTime <= DateTime.Now);
-			}
-			catch (Exception ex)
-			{
-				WriteErrorLog(ex);
-				return false;
-			}
-		}
+		//protected virtual bool GetIsOnline(int memberid)
+		//{
+		//	try
+		//	{
+		//		return (_logdata.LogTime <= DateTime.Now);
+		//	}
+		//	catch (Exception ex)
+		//	{
+		//		WriteErrorLog(ex);
+		//		return false;
+		//	}
+		//}
 		#endregion
 
 		#region Logger 記錄器
@@ -359,6 +338,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 				_unitofwork.BeginTranscation();
 
 				_database.Remove((ApplicationUser)entity);
+				isbatchmode = false;
 				SaveChanges();
 
 				_unitofwork.CommitTranscation();
@@ -516,14 +496,16 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 			try
 			{
 				int _memberid = FindUserIdFromPasswordResetToken(Token);
-				IAccount _founduser = FindUserById(_memberid, GetIsOnline(_memberid));
+				IAccount _founduser = FindUserById(_memberid, true);
 				if (_founduser != null)
 				{
 
 					_founduser.Password = newPassword;
+					_founduser.PasswordHash = HashedPassword(newPassword);
 
 					return (int)OperationCodeEnum.Account_ChangePassword_End_Success;
 				}
+
 				return (int)OperationCodeEnum.Account_ChangePassword_End_Fail;
 			}
 			catch (Exception ex)
@@ -563,7 +545,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		{
 			try
 			{
-				IAccount _founduser = FindUserById(entity.MemberId, GetIsOnline(entity.MemberId));
+				IAccount _founduser = FindUserById(entity.MemberId, true);
 				_unitofwork.BeginTranscation();
 				_founduser.DisplayName = entity.DisplayName;
 				_founduser.Password = entity.Password;

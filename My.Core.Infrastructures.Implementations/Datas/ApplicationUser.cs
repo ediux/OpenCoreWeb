@@ -20,9 +20,9 @@ namespace My.Core.Infrastructures.Implementations.Datas
 			_username = string.Empty;
 			_void = false;
 
-			Roles = new Collection<ApplicationRole>();
-			Groups = new Collection<ApplicationUserGroup>();
-			OpreationLogs = new Collection<UserOperationLog>();
+			_roles = new Lazy<Collection<ApplicationRole>>();
+			_groups = new Lazy<Collection<ApplicationUserGroup>>();
+			_opreationlogs = new Lazy<Collection<UserOperationLog>>();
 		}
 		private string _displayname;
 		/// <summary>
@@ -87,22 +87,53 @@ namespace My.Core.Infrastructures.Implementations.Datas
 		/// <value>The void.</value>
 		public virtual bool Void { get { return _void; } set { _void = value; } }
 
+		private Lazy<Collection<ApplicationRole>> _roles;
 		/// <summary>
 		/// 取得或設定使用者擁有的角色。
 		/// </summary>
 		/// <value>傳回使用者擁有的角色清單。</value>
-		public virtual Collection<ApplicationRole> Roles { get; set; }
+		public virtual Collection<ApplicationRole> Roles
+		{
+			get
+			{
+				return _roles.Value;
+			}
+			set
+			{
+				_roles = new Lazy<Collection<ApplicationRole>>(() => value);
+			}
+		}
 
+		private Lazy<Collection<ApplicationUserGroup>> _groups;
 		/// <summary>
 		/// Gets or sets the groups.
 		/// </summary>
 		/// <value>The groups.</value>
-		public virtual Collection<ApplicationUserGroup> Groups { get; set; }
+		public virtual Collection<ApplicationUserGroup> Groups
+		{
+			get
+			{
+				return _groups.Value;
+			}
+			set
+			{
+				_groups = new Lazy<Collection<ApplicationUserGroup>>(() => value);
+			}
+		}
+
+		private Lazy<Collection<UserOperationLog>> _opreationlogs;
 		/// <summary>
 		/// Gets or sets the opreation logs.
 		/// </summary>
 		/// <value>The opreation logs.</value>
-		public virtual Collection<UserOperationLog> OpreationLogs { get; set; }
+		public virtual Collection<UserOperationLog> OpreationLogs { 
+			get {
+				return _opreationlogs.Value;
+			} 
+			set {
+				_opreationlogs = new Lazy<Collection<UserOperationLog>>(() => value);
+			}
+		}
 
 		private string _resetpasswordtoken;
 

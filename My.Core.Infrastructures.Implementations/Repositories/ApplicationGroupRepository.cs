@@ -74,7 +74,7 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 									 select g).Single();
 				ApplicationUserGroup convertentity = (ApplicationUserGroup)foundgroup;
 				convertentity.Users.Add(founduser);
-				_unitofwork.SaveChanges();
+				SaveChanges();
 
 			}
 			catch (Exception ex)
@@ -170,7 +170,21 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 
 		public IQueryable<IGroup> FindAll()
 		{
-			throw new NotImplementedException();
+			try
+			{
+				_unitofwork.OpenDatabase();
+				_database = GetDatabase();
+				return _database.AsQueryable();
+			}
+			catch (Exception ex)
+			{
+				WriteErrorLog(ex);
+				throw ex;
+			}
+			finally
+			{
+				_unitofwork.CloseDatabase();
+			}
 		}
 
 		public List<IGroup> FindByUser(int id)

@@ -55,6 +55,8 @@
     <Compile Include="Repositories\IUserProfileRepository.cs" />
     <Compile Include="Repositories\IUserOperationCodeDefineRepository.cs" />
     <Compile Include="Repositories\IUserOperationLogRepository.cs" />
+    <Compile Include="IoC\IDynamicLoadingforDIFrameworkRepository.cs" />
+    <Compile Include="IoC\IDynamicLoadingforDIFrameworkService.cs" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Base\" />
@@ -63,6 +65,7 @@
     <Folder Include="Datas\" />
     <Folder Include="ViewModels\" />
     <Folder Include="Repositories\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -241,6 +241,11 @@ namespace My.Core.Infrastructures.Implementations.Repositories
 		}
 		#endregion
 
+		/// <summary>
+		/// Batchs the create.
+		/// </summary>
+		/// <returns>The create.</returns>
+		/// <param name="entities">Entities.</param>
 		public IList<IAccount> BatchCreate(IEnumerable<IAccount> entities)
 		{
 			try

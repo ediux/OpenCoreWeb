@@ -12,12 +12,10 @@ namespace My.Core.Infrastructures.ViewModels
 		int? CreateUID { get; set; }
 		DateTime? LastUpdateTime { get; set; }
 		DateTime? LastActivityTime { get; set; }
-
 		DateTime? LastUnlockedTime { get; set; }
-
 		DateTime? LastLoginFailTime { get; set; }
-
 		bool IsOnline { get; }
 	}
 }
 
+ 

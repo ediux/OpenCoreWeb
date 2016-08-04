@@ -10,11 +10,6 @@ namespace My.Core.Infrastructures
 	public interface IServiceBase
 	{
 		/// <summary>
-		/// 取得或設定注入式相依性主機執行個體。
-		/// </summary>
-		/// <value>The host.</value>
-		IDIHost Host { get; set; }
-		/// <summary>
 		/// Gets or sets the logger.
 		/// </summary>
 		/// <value>The logger.</value>

@@ -8,9 +8,33 @@ namespace My.Core.Infrastructures.DAL
     /// Unit of work with tsql.
     /// 使用TSQL的單元操作統一介面
     /// </summary>
-    public interface IUnitofWorkWithTSQL<TDbContext> : IUnitofWork<TDbContext> where TDbContext : class
+    public interface IUnitofWorkWithTSQL<TDbContext> : IUnitofWork where TDbContext : class
     {
+        /// <summary>
+        /// Begins the transcation.
+        /// </summary>
+        /// <returns>The transcation.</returns>
+        void BeginTranscation();
+        /// <summary>
+        /// Commits the transcation.
+        /// </summary>
+        /// <returns>The transcation.</returns>
+        void CommitTranscation();
+        /// <summary>
+        /// Opens the database.
+        /// </summary>
+        /// <returns>The database.</returns>
+        void OpenDatabase();
+        /// <summary>
+        /// Closes the database.
+        /// </summary>
+        /// <returns>The database.</returns>
+        void CloseDatabase();
 
+        /// <summary>
+        /// 復原交易
+        /// </summary>
+        void RollbackTranscation();
         /// <summary>
         /// Executes the function.
         /// </summary>

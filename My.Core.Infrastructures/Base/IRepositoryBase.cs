@@ -9,7 +9,7 @@ namespace My.Core.Infrastructures.DAL
 	/// <summary>
 	/// Repository base.
 	/// </summary>
-	public interface IRepositoryBase<T>
+	public interface IRepositoryBase<T> :IDisposable
 		where T : class
 	{
 		/// <summary>

@@ -4,6 +4,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using My.Core.Infrastructures.Implementations.Models;
+using System;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+using My.Core.Infrastructures.DAL;
+using My.Core.Infrastructures.Implementations;
+using My.Core.Infrastructures;
 
 namespace OpenCoreWeb.Models
 {
@@ -39,11 +45,16 @@ namespace OpenCoreWeb.Models
         , IUserPhoneNumberStore<ApplicationUser, int>, IUserSecurityStampStore<ApplicationUser, int>,
         IUserTokenProvider<ApplicationUser, int>, IUserTwoFactorStore<ApplicationUser, int>
     {
-        private OpenWebSiteEntities _database;
+       
+        private bool disposed = false;
+        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+        IUnitofWork uow;
+        IAccountRepository<ApplicationUser> accountrepo;
 
         public OpenCoreWebUserStore(DbContext context)
         {
-            _database = (OpenWebSiteEntities)context;
+            uow = (OpenWebSiteEntities)context;
+            accountrepo = uow.GetRepository<ApplicationUser>() as IAccountRepository<ApplicationUser>;
         }
 
         #region 使用者
@@ -71,11 +82,30 @@ namespace OpenCoreWeb.Models
         {
             throw new System.NotImplementedException();
         }
-
+       
         public void Dispose()
         {
-            throw new System.NotImplementedException();
+            Dispose(true);
+            GC.SuppressFinalize(this);
+
         }
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposed)
+                return;
+
+            if (disposing)
+            {
+                handle.Dispose();
+                // Free any other managed objects here.
+                //
+            }
+
+            // Free any unmanaged objects here.
+            //
+            disposed = true;
+        }
+
         #endregion
 
         #region User Role Store

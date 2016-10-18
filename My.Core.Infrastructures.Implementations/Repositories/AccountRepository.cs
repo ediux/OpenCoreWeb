@@ -6,31 +6,25 @@ using System.Linq.Expressions;
 using My.Core.Infrastructures.DAL;
 using My.Core.Infrastructures.Logs;
 using My.Core.Infrastructures.Implementations.Models;
+using System.Runtime.InteropServices;
+using Microsoft.Win32.SafeHandles;
+using Microsoft.AspNet.Identity;
 
 namespace My.Core.Infrastructures.Implementations
 {
     public class AccountRepository : IAccountRepository<ApplicationUser>
     {
-        private IUnitofWork<OpenWebSiteEntities> _unitofwork;
+        private IUnitofWork _unitofwork;
 
-        private OpenWebSiteEntities _database;
+        private DbSet<ApplicationUser> _datatable;
 
-        public AccountRepository(IUnitofWork<OpenWebSiteEntities> unitofwork)
+        public AccountRepository(IUnitofWork unitofwork)
         {
             _unitofwork = unitofwork;
-            _database = _unitofwork.GetDatabaseObject<OpenWebSiteEntities>();
-
+            _datatable = _unitofwork.GetEntity<ApplicationUser>() as DbSet<ApplicationUser>;
         }
 
         #region Helper Functions
-        /// <summary>
-        /// Resets the database object.
-        /// </summary>
-        /// <returns>The database object.</returns>
-        protected virtual OpenWebSiteEntities GetDatabase()
-        {
-            return _unitofwork.GetDatabaseObject<OpenWebSiteEntities>();
-        }
 
         /// <summary>
         /// Writes the error log.
@@ -55,56 +49,35 @@ namespace My.Core.Infrastructures.Implementations
         {
             try
             {
-                IRepositoryBase<UserOperationLog> useroperationlog = _unitofwork.GetRepository<UserOperationLog>();
+                //IRepositoryBase<UserOperationLog> useroperationlog = _unitofwork.GetRepository<UserOperationLog>();
 
                 string _url = string.Empty;
+                string _body = string.Empty;
 
                 if (System.Web.HttpContext.Current != null)
                 {
                     _url = System.Web.HttpContext.Current.Request.Url.AbsoluteUri;
+                    _body = Newtonsoft.Json.JsonConvert.SerializeObject(System.Web.HttpContext.Current.Request.Form);
                 }
 
                 if (User == null)
                 {
-                    useroperationlog.Create(new UserOperationLog()
-                    {
-                        Body = string.Empty,
-                        UserId = GetCurrentLoginedUserId(),
-                        LogTime = DateTime.Now,
-                        OpreationCode = (int)code,
-                        URL = _url
-                    });
-
-                    useroperationlog.SaveChanges();
+                    return;
                 }
-                else
+
+                IUserOperationCodeDefineRepository<UserOperationCodeDefine> logdefinerepo = _unitofwork.GetRepository<UserOperationCodeDefine>() as IUserOperationCodeDefineRepository<UserOperationCodeDefine>;
+
+                var founddefined = logdefinerepo.Find((int)code);
+
+
+                User.UserOperationLog.Add(new UserOperationLog()
                 {
-                    if (User.Id == -1)
-                    {
-                        useroperationlog.Create(new UserOperationLog()
-                        {
-                            Body = string.Format("{0};{1};{2}", User.UserName, User.Password, User.PasswordHash),
-                            UserId = GetCurrentLoginedUserId(),
-                            LogTime = DateTime.Now,
-                            OpreationCode = (int)code,
-                            URL = _url
-                        });
-
-                    }
-                    else
-                    {
-                        useroperationlog.Create(new UserOperationLog()
-                        {
-                            Body = string.Empty,
-                            UserId = -1,
-                            LogTime = DateTime.Now,
-                            OpreationCode = (int)code,
-                            URL = _url
-                        });
-                    }
-                    useroperationlog.SaveChanges();
-                }
-
+                    Body = _body,
+                    UserId = User.Id,
+                    LogTime = DateTime.Now,
+                    OpreationCode = (int)code,
+                    URL = _url
+                });
             }
             catch (Exception ex)
             {
@@ -115,13 +88,11 @@ namespace My.Core.Infrastructures.Implementations
 
         protected virtual int GetCurrentLoginedUserId()
         {
-            var founduser = FindUserByLoginAccount(System.Web.HttpContext.Current.User.Identity.Name, true);
-
-            if (founduser != null)
+            if (System.Web.HttpContext.Current != null)
             {
-                return founduser.Id;
+                return System.Web.HttpContext.Current.User.Identity.GetUserId<int>();
             }
-
+          
             return -1;
         }
 
@@ -178,47 +149,18 @@ namespace My.Core.Infrastructures.Implementations
         {
             try
             {
-                List<ApplicationUser> _insertednewuserlist = new List<ApplicationUser>();
-
-                _unitofwork.OpenDatabase();
-
-                _database = GetDatabase();
-
-                _unitofwork.BeginTranscation();
-
-                _database.ApplicationUser.AddRange(entities);
-                //foreach (ApplicationUser newuser in entities)
-                //{
-                //    try
-                //    {
-                //        ApplicationUser inserteduser = _unitofwork.GetEntity<IDbSet<ApplicationUser>>().Add((ApplicationUser)newuser);
-                //        WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Start, inserteduser);
-                //        SaveChanges();
-                //        WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_End_Success, inserteduser);
-                //        _insertednewuserlist.Add(inserteduser);
-                //    }
-                //    catch (Exception ex)
-                //    {
-                //        WriteErrorLog(ex);
-                //        WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_End_Fail, newuser);
-                //    }
-
-                //}
-
-                _unitofwork.CommitTranscation();
-
-                return _insertednewuserlist;
+                IList<ApplicationUser> result = ((DbSet<ApplicationUser>)_datatable).AddRange(entities).ToList();
+                SaveChanges();
+                return result;
             }
             catch (Exception ex)
             {
                 WriteErrorLog(ex);
+
                 WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Rollback, new ApplicationUser() { Id = -1 });
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public ApplicationUser ChangePassword(ApplicationUser UpdatedUserData)
@@ -228,17 +170,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, UpdatedUserData);
 
                 ApplicationUser _updateduser = Update(UpdatedUserData);
-                // Find(UpdatedUserData.Id);
 
-                if (_updateduser != null)
-                {
-
-                    WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Success, _updateduser);
-                }
-                else
-                {
-                    WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Fail, _updateduser);
-                }
 
                 return _updateduser;
             }
@@ -248,10 +180,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Fail, UpdatedUserData);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public ApplicationUser Create(ApplicationUser entity)
@@ -259,7 +188,8 @@ namespace My.Core.Infrastructures.Implementations
             try
             {
                 WriteUserOperationLog(OperationCodeEnum.Account_Create_Start, entity);
-                ApplicationUser inserteduser = _database.ApplicationUser.Add((ApplicationUser)entity);
+                ApplicationUser inserteduser = _datatable.Add((ApplicationUser)entity);
+
                 SaveChanges();
                 WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Success, inserteduser);
                 return inserteduser;
@@ -271,10 +201,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteUserOperationLog(OperationCodeEnum.Account_Create_Rollback, entity);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public void Delete(ApplicationUser entity)
@@ -282,15 +209,10 @@ namespace My.Core.Infrastructures.Implementations
             try
             {
                 WriteUserOperationLog(OperationCodeEnum.Account_Delete_Start, entity);
-                _unitofwork.OpenDatabase();
-                _database = GetDatabase();
-                _unitofwork.BeginTranscation();
                 ApplicationUser founduser = Find(entity.Id);
-                _database.ApplicationUser.Remove(founduser);
-                SaveChanges();
-                _unitofwork.CommitTranscation();
+                _datatable.Remove(founduser);
                 WriteUserOperationLog(OperationCodeEnum.Account_Delete_End_Success, entity);
-
+                SaveChanges();
             }
             catch (Exception ex)
             {
@@ -299,10 +221,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteUserOperationLog(OperationCodeEnum.Account_Delete_Rollback, entity);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public ApplicationUser Find(params object[] values)
@@ -312,7 +231,7 @@ namespace My.Core.Infrastructures.Implementations
 
             try
             {
-                _currentexecutinguser = _database.ApplicationUser.Find(values);
+                _currentexecutinguser = _datatable.Find(values);
                 return _currentexecutinguser;
             }
             catch (Exception ex)
@@ -321,19 +240,14 @@ namespace My.Core.Infrastructures.Implementations
                 WriteUserOperationLog(OperationCodeEnum.Accpimt_Find_End_Fail, _currentexecutinguser);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public IQueryable<ApplicationUser> FindAll()
         {
             try
             {
-                _unitofwork.OpenDatabase();
-                _database = _unitofwork.GetDatabaseObject<OpenWebSiteEntities>();
-                return _database.ApplicationUser
+                return _datatable
                     .Include(w => w.ApplicationUserGroup)
                     .Include(w => w.ApplicationUserProfileRef)
                     .Include(w => w.ApplicationUserRole).AsQueryable();
@@ -343,10 +257,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public IList<ApplicationUser> FindAllAccounts()
@@ -360,17 +271,14 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public ApplicationUser FindByEmail(string email)
         {
             try
             {
-                IQueryable<ApplicationUser> queryset = _database.ApplicationUser.Include(i => i.ApplicationUserProfileRef);
+                IQueryable<ApplicationUser> queryset = _datatable.Include(i => i.ApplicationUserProfileRef);
 
                 var result = from q in queryset
                              from profilerefs in q.ApplicationUserProfileRef
@@ -388,10 +296,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_End_Fail, null);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public ApplicationUser FindUserById(int MemberId, bool isOnline)
@@ -433,10 +338,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public ApplicationUser FindUserByLoginAccount(string LoginAccount, bool IsOnline)
@@ -445,7 +347,8 @@ namespace My.Core.Infrastructures.Implementations
             {
                 ApplicationUser _founduser = null;
 
-                var result = from q in _database.ApplicationUser
+
+                var result = from q in _datatable
                              where q.UserName.Equals(LoginAccount, StringComparison.InvariantCultureIgnoreCase)
                              select q;
 
@@ -467,10 +370,8 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
+
         }
 
         public int FindUserIdFromPasswordResetToken(string Token)
@@ -479,7 +380,7 @@ namespace My.Core.Infrastructures.Implementations
             {
                 ApplicationUser _founduser = null;
 
-                var result = from q in _database.ApplicationUser
+                var result = from q in _datatable
                              where q.ResetPasswordToken.Equals(Token, StringComparison.InvariantCulture)
                              select q;
 
@@ -491,10 +392,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public bool IsConfirmed(int MemberId)
@@ -520,10 +418,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public int ResetPasswordWithToken(string Token, string newPassword)
@@ -546,18 +441,12 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public void SaveChanges()
         {
-            if (_database != null)
-                _database.SaveChanges();
-            else
-                _unitofwork.SaveChanges();
+            _unitofwork.SaveChanges();
         }
 
         public IList<ApplicationUser> ToList(IQueryable<ApplicationUser> source)
@@ -578,8 +467,18 @@ namespace My.Core.Infrastructures.Implementations
         {
             try
             {
-                //ApplicationUser _founduser = Find(entity.Id);
+                ApplicationUser _founduser = Find(entity.Id);
 
+                if (entity.Password != _founduser.Password
+                    || entity.PasswordHash != _founduser.PasswordHash)
+                {
+                    WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, entity);
+                    _founduser.Password = entity.Password;
+                    _founduser.PasswordHash = entity.PasswordHash;
+                    _founduser.LastUpdateTime = DateTime.Now;
+                    _founduser.LastUpdateUserId = GetCurrentLoginedUserId();
+                    WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Success, entity);
+                }
                 //_unitofwork.BeginTranscation();
                 ////_founduser.DisplayName = entity.DisplayName;
                 //_founduser.Password = entity.Password;
@@ -592,7 +491,7 @@ namespace My.Core.Infrastructures.Implementations
                 //_founduser.ResetPasswordToken = entity.ResetPasswordToken;
 
                 SaveChanges();
-                _unitofwork.CommitTranscation();
+
                 return FindUserById(entity.Id, true);
             }
             catch (Exception ex)
@@ -600,10 +499,7 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
-            {
-                _unitofwork.CloseDatabase();
-            }
+
         }
 
         public bool ValidateUser(ApplicationUser UserDataToValidated)
@@ -611,7 +507,7 @@ namespace My.Core.Infrastructures.Implementations
             try
             {
                 ApplicationUser _validatedUser = null;
-                var result = from w in _database.ApplicationUser
+                var result = from w in _datatable
                              where w.UserName == UserDataToValidated.UserName &&
                          (UserDataToValidated.Password == w.Password || UserDataToValidated.PasswordHash == w.PasswordHash)
                              select w;
@@ -629,10 +525,28 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-            finally
+
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        private bool disposed = false;
+        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposed)
             {
-                _unitofwork.CloseDatabase();
+                if (disposing)
+                {
+                    _unitofwork.Dispose();
+                }
             }
+
+            disposed = true;
+
         }
     }
 }

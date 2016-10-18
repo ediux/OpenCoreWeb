@@ -73,15 +73,45 @@
     <Compile Include="Models\ApplicationGroup.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ApplicationGroup.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ApplicationGroupTree.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationGroupTree.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationRole.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationUser.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationUserGroup.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationUserProfile.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\ApplicationUserProfileRef.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ApplicationUserProfileRef.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ApplicationUserRole.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ApplicationUserRole.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\EFGeneratePartialClass.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\OpenWebSiteEntities.partial.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\ApplicationRole.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
@@ -133,6 +163,10 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <DependentUpon>ApplicationDbModel.edmx</DependentUpon>
       <LastGenOutput>ApplicationDbModel.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\EFGeneratePartialClass.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>EFGeneratePartialClass.cs</LastGenOutput>
     </Content>
   </ItemGroup>
   <ItemGroup>

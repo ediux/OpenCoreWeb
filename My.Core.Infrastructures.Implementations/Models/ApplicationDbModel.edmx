@@ -64,6 +64,15 @@
           <Property Name="LockoutEndDate" Type="smalldatetime" />
           <Property Name="ResetPasswordToken" Type="nvarchar" MaxLength="512" />
         </EntityType>
+        <EntityType Name="ApplicationUserClaim">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ClaimType" Type="nvarchar" MaxLength="256" />
+          <Property Name="ClaimValue" Type="nvarchar(max)" />
+        </EntityType>
         <EntityType Name="ApplicationUserGroup">
           <Key>
             <PropertyRef Name="UserId" />
@@ -72,6 +81,14 @@
           <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="GroupId" Type="int" Nullable="false" />
           <Property Name="Void" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ApplicationUserLogin">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="int" Nullable="false" />
+          <Property Name="LoginProvider" Type="nvarchar" MaxLength="512" />
+          <Property Name="ProviderKey" Type="nvarchar" MaxLength="512" />
         </EntityType>
         <EntityType Name="ApplicationUserProfile">
           <Key>
@@ -162,6 +179,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ApplicationUserClaim_ToApplicationUser">
+          <End Role="ApplicationUser" Type="Self.ApplicationUser" Multiplicity="1" />
+          <End Role="ApplicationUserClaim" Type="Self.ApplicationUserClaim" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ApplicationUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ApplicationUserClaim">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ApplicationUserGroup_ToApplicationGroup">
           <End Role="ApplicationGroup" Type="Self.ApplicationGroup" Multiplicity="1" />
           <End Role="ApplicationUserGroup" Type="Self.ApplicationUserGroup" Multiplicity="*" />
@@ -182,6 +211,18 @@
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="ApplicationUserGroup">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ApplicationUserLogin_ToApplicationUser">
+          <End Role="ApplicationUser" Type="Self.ApplicationUser" Multiplicity="1" />
+          <End Role="ApplicationUserLogin" Type="Self.ApplicationUserLogin" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ApplicationUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ApplicationUserLogin">
               <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
@@ -263,7 +304,9 @@
           <EntitySet Name="ApplicationGroupTree" EntityType="Self.ApplicationGroupTree" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationRole" EntityType="Self.ApplicationRole" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationUser" EntityType="Self.ApplicationUser" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ApplicationUserClaim" EntityType="Self.ApplicationUserClaim" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationUserGroup" EntityType="Self.ApplicationUserGroup" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ApplicationUserLogin" EntityType="Self.ApplicationUserLogin" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationUserProfile" EntityType="Self.ApplicationUserProfile" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationUserProfileRef" EntityType="Self.ApplicationUserProfileRef" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationUserRole" EntityType="Self.ApplicationUserRole" Schema="dbo" store:Type="Tables" />
@@ -281,6 +324,10 @@
             <End Role="ApplicationGroup" EntitySet="ApplicationGroup" />
             <End Role="ApplicationGroupTree" EntitySet="ApplicationGroupTree" />
           </AssociationSet>
+          <AssociationSet Name="FK_ApplicationUserClaim_ToApplicationUser" Association="Self.FK_ApplicationUserClaim_ToApplicationUser">
+            <End Role="ApplicationUser" EntitySet="ApplicationUser" />
+            <End Role="ApplicationUserClaim" EntitySet="ApplicationUserClaim" />
+          </AssociationSet>
           <AssociationSet Name="FK_ApplicationUserGroup_ToApplicationGroup" Association="Self.FK_ApplicationUserGroup_ToApplicationGroup">
             <End Role="ApplicationGroup" EntitySet="ApplicationGroup" />
             <End Role="ApplicationUserGroup" EntitySet="ApplicationUserGroup" />
@@ -288,6 +335,10 @@
           <AssociationSet Name="FK_ApplicationUserGroup_ToApplicationUser" Association="Self.FK_ApplicationUserGroup_ToApplicationUser">
             <End Role="ApplicationUser" EntitySet="ApplicationUser" />
             <End Role="ApplicationUserGroup" EntitySet="ApplicationUserGroup" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ApplicationUserLogin_ToApplicationUser" Association="Self.FK_ApplicationUserLogin_ToApplicationUser">
+            <End Role="ApplicationUser" EntitySet="ApplicationUser" />
+            <End Role="ApplicationUserLogin" EntitySet="ApplicationUserLogin" />
           </AssociationSet>
           <AssociationSet Name="FK_ApplicationUserProfileRef_ToApplicationUser" Association="Self.FK_ApplicationUserProfileRef_ToApplicationUser">
             <End Role="ApplicationUser" EntitySet="ApplicationUser" />
@@ -388,6 +439,8 @@
           <Property Name="LockoutEndDate" Type="DateTime" Precision="0" />
           <Property Name="ResetPasswordToken" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="UserOperationLog" Relationship="OpenWebSiteModel.FK_UserOperationLog_ToApplicationUser" FromRole="ApplicationUser" ToRole="UserOperationLog" />
+          <NavigationProperty Name="ApplicationUserClaim" Relationship="OpenWebSiteModel.FK_ApplicationUserClaim_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserClaim" />
+          <NavigationProperty Name="ApplicationUserLogin" Relationship="OpenWebSiteModel.FK_ApplicationUserLogin_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserLogin" />
         </EntityType>
         <EntityType Name="ApplicationUserGroup">
           <Key>
@@ -602,6 +655,16 @@
             <End Role="UserOperationCodeDefine" EntitySet="UserOperationCodeDefine" />
             <End Role="UserOperationLog" EntitySet="UserOperationLog" />
           </AssociationSet>
+          <EntitySet Name="ApplicationUserClaim" EntityType="OpenWebSiteModel.ApplicationUserClaim" />
+          <EntitySet Name="ApplicationUserLogin" EntityType="OpenWebSiteModel.ApplicationUserLogin" />
+          <AssociationSet Name="FK_ApplicationUserClaim_ToApplicationUser" Association="OpenWebSiteModel.FK_ApplicationUserClaim_ToApplicationUser">
+            <End Role="ApplicationUser" EntitySet="ApplicationUser" />
+            <End Role="ApplicationUserClaim" EntitySet="ApplicationUserClaim" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ApplicationUserLogin_ToApplicationUser" Association="OpenWebSiteModel.FK_ApplicationUserLogin_ToApplicationUser">
+            <End Role="ApplicationUser" EntitySet="ApplicationUser" />
+            <End Role="ApplicationUserLogin" EntitySet="ApplicationUserLogin" />
+          </AssociationSet>
         </EntityContainer>
         <EntityType Name="UserOperationCodeDefine">
           <Key>
@@ -646,6 +709,49 @@
             </Principal>
             <Dependent Role="UserOperationLog">
               <PropertyRef Name="OpreationCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityType Name="ApplicationUserClaim">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ClaimType" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <Property Name="ClaimValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ApplicationUser" Relationship="OpenWebSiteModel.FK_ApplicationUserClaim_ToApplicationUser" FromRole="ApplicationUserClaim" ToRole="ApplicationUser" />
+        </EntityType>
+        <EntityType Name="ApplicationUserLogin">
+          <Key>
+            <PropertyRef Name="UserId" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="LoginProvider" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="ProviderKey" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ApplicationUser" Relationship="OpenWebSiteModel.FK_ApplicationUserLogin_ToApplicationUser" FromRole="ApplicationUserLogin" ToRole="ApplicationUser" />
+        </EntityType>
+        <Association Name="FK_ApplicationUserClaim_ToApplicationUser">
+          <End Type="OpenWebSiteModel.ApplicationUser" Role="ApplicationUser" Multiplicity="1" />
+          <End Type="OpenWebSiteModel.ApplicationUserClaim" Role="ApplicationUserClaim" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ApplicationUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ApplicationUserClaim">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ApplicationUserLogin_ToApplicationUser">
+          <End Type="OpenWebSiteModel.ApplicationUser" Role="ApplicationUser" Multiplicity="1" />
+          <End Type="OpenWebSiteModel.ApplicationUserLogin" Role="ApplicationUserLogin" Multiplicity="0..1" />
+          <ReferentialConstraint>
+            <Principal Role="ApplicationUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="ApplicationUserLogin">
+              <PropertyRef Name="UserId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -777,6 +883,25 @@
                 <ScalarProperty Name="LogTime" ColumnName="LogTime" />
                 <ScalarProperty Name="Body" ColumnName="Body" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ApplicationUserClaim">
+            <EntityTypeMapping TypeName="OpenWebSiteModel.ApplicationUserClaim">
+              <MappingFragment StoreEntitySet="ApplicationUserClaim">
+                <ScalarProperty Name="ClaimValue" ColumnName="ClaimValue" />
+                <ScalarProperty Name="ClaimType" ColumnName="ClaimType" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ApplicationUserLogin">
+            <EntityTypeMapping TypeName="OpenWebSiteModel.ApplicationUserLogin">
+              <MappingFragment StoreEntitySet="ApplicationUserLogin">
+                <ScalarProperty Name="ProviderKey" ColumnName="ProviderKey" />
+                <ScalarProperty Name="LoginProvider" ColumnName="LoginProvider" />
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

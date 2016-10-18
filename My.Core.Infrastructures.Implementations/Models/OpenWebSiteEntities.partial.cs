@@ -8,6 +8,11 @@ namespace My.Core.Infrastructures.Implementations.Models
 {
     public partial class OpenWebSiteEntities
     {
+        public bool RequireUniqueEmail { get; set; }
 
+        public static OpenWebSiteEntities Create()
+        {
+            return new OpenWebSiteEntities();
+        }
     }
 }

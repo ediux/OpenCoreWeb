@@ -50,5 +50,7 @@ namespace My.Core.Infrastructures.Implementations.Models
         public virtual ICollection<ApplicationUserRole> ApplicationUserRole { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserOperationLog> UserOperationLog { get; set; }
+        public virtual ApplicationUserClaim ApplicationUserClaim { get; set; }
+        public virtual ApplicationUserLogin ApplicationUserLogin { get; set; }
     }
 }

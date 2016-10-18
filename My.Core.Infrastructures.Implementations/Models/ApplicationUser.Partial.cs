@@ -1,13 +1,23 @@
 namespace My.Core.Infrastructures.Implementations.Models
 {
+    using Microsoft.AspNet.Identity;
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.ComponentModel.DataAnnotations;
+    using System.Security.Claims;
+    using System.Threading.Tasks;
     
     [MetadataType(typeof(ApplicationUserMetaData))]
-    public partial class ApplicationUser
+    public partial class ApplicationUser : IUser<int>
     {
-
+        public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser,int> manager)
+        {
+            // 注意 authenticationType 必須符合 CookieAuthenticationOptions.AuthenticationType 中定義的項目
+            var userIdentity = await manager.CreateIdentityAsync(this, DefaultAuthenticationTypes.ApplicationCookie);
+            // 在這裡新增自訂使用者宣告
+            return userIdentity;
+        }
     }
     
     public partial class ApplicationUserMetaData
@@ -17,6 +27,7 @@ namespace My.Core.Infrastructures.Implementations.Models
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
         [Required]
+        [Display(Name="帳號名稱",ShortName="Account")]
         public string UserName { get; set; }
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]

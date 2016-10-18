@@ -26,6 +26,10 @@
         <EntityTypeShape EntityType="OpenWebSiteModel.UserOperationLog" Width="1.5" PointX="6" PointY="8.25" />
         <AssociationConnector Association="OpenWebSiteModel.FK_UserOperationLog_ToApplicationUser" />
         <AssociationConnector Association="OpenWebSiteModel.FK_UserOperationLog_ToUserOperationCodeDefine" />
+        <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserClaim" Width="1.5" PointX="3" PointY="16.5" />
+        <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserLogin" Width="1.5" PointX="3" PointY="19.125" />
+        <AssociationConnector Association="OpenWebSiteModel.FK_ApplicationUserClaim_ToApplicationUser" />
+        <AssociationConnector Association="OpenWebSiteModel.FK_ApplicationUserLogin_ToApplicationUser" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

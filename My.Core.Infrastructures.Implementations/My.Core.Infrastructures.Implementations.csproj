@@ -46,20 +46,57 @@
     <Reference Include="MySql.Data.Entity.EF6">
       <HintPath>..\packages\MySql.Data.Entity.6.9.9\lib\net45\MySql.Data.Entity.EF6.dll</HintPath>
     </Reference>
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="Models\ApplicationDbModel.Context.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationDbModel.Context.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationDbModel.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationDbModel.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ApplicationDbModel.edmx</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationGroup.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationGroupTree.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationUserProfileRef.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationUserRole.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Datas\ApplicationRole.cs" />
-    <Compile Include="Datas\ApplicationUser.cs" />
-    <Compile Include="Datas\ApplicationDbContext.cs" />
-    <Compile Include="Datas\UserOperationCodeDefine.cs" />
-    <Compile Include="Datas\UserOperationLog.cs" />
-    <Compile Include="Datas\ApplicationUserGroup.cs" />
-    <Compile Include="Datas\ApplicationUserProfile.cs" />
+    <Compile Include="Models\ApplicationRole.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationUser.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UserOperationCodeDefine.cs" />
+    <Compile Include="Models\UserOperationLog.cs" />
+    <Compile Include="Models\ApplicationUserGroup.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\ApplicationUserProfile.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Repositories\AccountRepository.cs" />
     <Compile Include="Enums\OperationCodeEnum.cs" />
     <Compile Include="Repositories\ApplicationRoleRepository.cs" />
@@ -74,10 +111,32 @@
     <Folder Include="Base\" />
   </ItemGroup>
   <ItemGroup>
+    <EntityDeploy Include="Models\ApplicationDbModel.edmx">
+      <Generator>EntityModelCodeGenerator</Generator>
+      <LastGenOutput>ApplicationDbModel.Designer.cs</LastGenOutput>
+    </EntityDeploy>
+    <None Include="Models\ApplicationDbModel.edmx.diagram">
+      <DependentUpon>ApplicationDbModel.edmx</DependentUpon>
+    </None>
     <None Include="packages.config" />
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Models\ApplicationDbModel.Context.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ApplicationDbModel.edmx</DependentUpon>
+      <LastGenOutput>ApplicationDbModel.Context.cs</LastGenOutput>
+    </Content>
+    <Content Include="Models\ApplicationDbModel.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <DependentUpon>ApplicationDbModel.edmx</DependentUpon>
+      <LastGenOutput>ApplicationDbModel.cs</LastGenOutput>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
 </Project>

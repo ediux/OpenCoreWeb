@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using My.Core.Infrastructures.DAL;
-using My.Core.Infrastructures.Datas;
 
 namespace My.Core.Infrastructures
 {
-	public interface IAccountRepository :IRepositoryBase<IAccount>
+    public interface IAccountRepository<IAccount> : IRepositoryBase<IAccount> where IAccount : class
 	{
 		/// <summary>
 		/// 取得所有系統內帳號！

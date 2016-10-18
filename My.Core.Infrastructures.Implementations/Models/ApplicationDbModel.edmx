@@ -4,7 +4,7 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="OpenWebSiteModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="OpenWebSiteModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
         <EntityType Name="ApplicationGroup">
           <Key>
             <PropertyRef Name="Id" />
@@ -56,6 +56,13 @@
           <Property Name="CreateTime" Type="smalldatetime" Nullable="false" />
           <Property Name="LastUpdateUserId" Type="int" Nullable="false" />
           <Property Name="LastUpdateTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="LastActivityTime" Type="smalldatetime" />
+          <Property Name="LastUnlockedTime" Type="smalldatetime" />
+          <Property Name="LastLoginFailTime" Type="smalldatetime" />
+          <Property Name="AccessFailedCount" Type="int" Nullable="false" />
+          <Property Name="LockoutEnabled" Type="bit" />
+          <Property Name="LockoutEndDate" Type="smalldatetime" />
+          <Property Name="ResetPasswordToken" Type="nvarchar" MaxLength="512" />
         </EntityType>
         <EntityType Name="ApplicationUserGroup">
           <Key>
@@ -71,6 +78,7 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="DisplayName" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Address" Type="nvarchar(max)" />
           <Property Name="EMail" Type="nvarchar" MaxLength="512" Nullable="false" />
           <Property Name="EMailConfirmed" Type="bit" Nullable="false" />
@@ -98,6 +106,25 @@
           <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="RoleId" Type="int" Nullable="false" />
           <Property Name="Void" Type="bit" Nullable="false" />
+        </EntityType>
+        <EntityType Name="UserOperationCodeDefine">
+          <Key>
+            <PropertyRef Name="OpreationCode" />
+          </Key>
+          <Property Name="OpreationCode" Type="int" Nullable="false" />
+          <Property Name="Description" Type="nvarchar" MaxLength="512" Nullable="false" />
+          <Property Name="MessageResourceKey" Type="nvarchar" MaxLength="256" />
+        </EntityType>
+        <EntityType Name="UserOperationLog">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Body" Type="nvarchar(max)" />
+          <Property Name="LogTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="OpreationCode" Type="int" Nullable="false" />
+          <Property Name="URL" Type="nvarchar(max)" />
+          <Property Name="UserId" Type="int" Nullable="false" />
         </EntityType>
         <Association Name="FK_ApplicationGroupTree_ToApplicationGroup_Child">
           <End Role="ApplicationGroup" Type="Self.ApplicationGroup" Multiplicity="1" />
@@ -207,6 +234,30 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_UserOperationLog_ToApplicationUser">
+          <End Role="ApplicationUser" Type="Self.ApplicationUser" Multiplicity="1" />
+          <End Role="UserOperationLog" Type="Self.UserOperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ApplicationUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserOperationLog">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserOperationLog_ToUserOperationCodeDefine">
+          <End Role="UserOperationCodeDefine" Type="Self.UserOperationCodeDefine" Multiplicity="1" />
+          <End Role="UserOperationLog" Type="Self.UserOperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserOperationCodeDefine">
+              <PropertyRef Name="OpreationCode" />
+            </Principal>
+            <Dependent Role="UserOperationLog">
+              <PropertyRef Name="OpreationCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <EntityContainer Name="OpenWebSiteModelStoreContainer">
           <EntitySet Name="ApplicationGroup" EntityType="Self.ApplicationGroup" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationGroupTree" EntityType="Self.ApplicationGroupTree" Schema="dbo" store:Type="Tables" />
@@ -216,6 +267,8 @@
           <EntitySet Name="ApplicationUserProfile" EntityType="Self.ApplicationUserProfile" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationUserProfileRef" EntityType="Self.ApplicationUserProfileRef" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ApplicationUserRole" EntityType="Self.ApplicationUserRole" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserOperationCodeDefine" EntityType="Self.UserOperationCodeDefine" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="UserOperationLog" EntityType="Self.UserOperationLog" Schema="dbo" store:Type="Tables" />
           <AssociationSet Name="FK_ApplicationGroupTree_ToApplicationGroup_Child" Association="Self.FK_ApplicationGroupTree_ToApplicationGroup_Child">
             <End Role="ApplicationGroup" EntitySet="ApplicationGroup" />
             <End Role="ApplicationGroupTree" EntitySet="ApplicationGroupTree" />
@@ -252,9 +305,16 @@
             <End Role="ApplicationUser" EntitySet="ApplicationUser" />
             <End Role="ApplicationUserRole" EntitySet="ApplicationUserRole" />
           </AssociationSet>
+          <AssociationSet Name="FK_UserOperationLog_ToApplicationUser" Association="Self.FK_UserOperationLog_ToApplicationUser">
+            <End Role="ApplicationUser" EntitySet="ApplicationUser" />
+            <End Role="UserOperationLog" EntitySet="UserOperationLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserOperationLog_ToUserOperationCodeDefine" Association="Self.FK_UserOperationLog_ToUserOperationCodeDefine">
+            <End Role="UserOperationCodeDefine" EntitySet="UserOperationCodeDefine" />
+            <End Role="UserOperationLog" EntitySet="UserOperationLog" />
+          </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="OpenWebSiteModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -320,6 +380,14 @@
           <NavigationProperty Name="ApplicationUserGroup" Relationship="Self.FK_ApplicationUserGroup_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserGroup" />
           <NavigationProperty Name="ApplicationUserProfileRef" Relationship="Self.FK_ApplicationUserProfileRef_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserProfileRef" />
           <NavigationProperty Name="ApplicationUserRole" Relationship="Self.FK_ApplicationUserRole_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserRole" />
+          <Property Name="LastActivityTime" Type="DateTime" Precision="0" />
+          <Property Name="LastUnlockedTime" Type="DateTime" Precision="0" />
+          <Property Name="LastLoginFailTime" Type="DateTime" Precision="0" />
+          <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
+          <Property Name="LockoutEnabled" Type="Boolean" />
+          <Property Name="LockoutEndDate" Type="DateTime" Precision="0" />
+          <Property Name="ResetPasswordToken" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="UserOperationLog" Relationship="OpenWebSiteModel.FK_UserOperationLog_ToApplicationUser" FromRole="ApplicationUser" ToRole="UserOperationLog" />
         </EntityType>
         <EntityType Name="ApplicationUserGroup">
           <Key>
@@ -345,6 +413,7 @@
           <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="0" />
           <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="0" />
           <NavigationProperty Name="ApplicationUserProfileRef" Relationship="Self.FK_ApplicationUserProfileRef_ToApplicationUserProfile" FromRole="ApplicationUserProfile" ToRole="ApplicationUserProfileRef" />
+          <Property Name="DisplayName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
         <EntityType Name="ApplicationUserProfileRef">
           <Key>
@@ -523,7 +592,63 @@
             <End Role="ApplicationUserProfile" EntitySet="ApplicationUserProfile" />
             <End Role="ApplicationUserProfileRef" EntitySet="ApplicationUserProfileRef" />
           </AssociationSet>
+          <EntitySet Name="UserOperationCodeDefine" EntityType="OpenWebSiteModel.UserOperationCodeDefine" />
+          <EntitySet Name="UserOperationLog" EntityType="OpenWebSiteModel.UserOperationLog" />
+          <AssociationSet Name="FK_UserOperationLog_ToApplicationUser" Association="OpenWebSiteModel.FK_UserOperationLog_ToApplicationUser">
+            <End Role="ApplicationUser" EntitySet="ApplicationUser" />
+            <End Role="UserOperationLog" EntitySet="UserOperationLog" />
+          </AssociationSet>
+          <AssociationSet Name="FK_UserOperationLog_ToUserOperationCodeDefine" Association="OpenWebSiteModel.FK_UserOperationLog_ToUserOperationCodeDefine">
+            <End Role="UserOperationCodeDefine" EntitySet="UserOperationCodeDefine" />
+            <End Role="UserOperationLog" EntitySet="UserOperationLog" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="UserOperationCodeDefine">
+          <Key>
+            <PropertyRef Name="OpreationCode" />
+          </Key>
+          <Property Name="OpreationCode" Type="Int32" Nullable="false" />
+          <Property Name="Description" Type="String" Nullable="false" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="MessageResourceKey" Type="String" MaxLength="256" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="UserOperationLog" Relationship="OpenWebSiteModel.FK_UserOperationLog_ToUserOperationCodeDefine" FromRole="UserOperationCodeDefine" ToRole="UserOperationLog" />
+        </EntityType>
+        <EntityType Name="UserOperationLog">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Body" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="LogTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="OpreationCode" Type="Int32" Nullable="false" />
+          <Property Name="URL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="ApplicationUser" Relationship="OpenWebSiteModel.FK_UserOperationLog_ToApplicationUser" FromRole="UserOperationLog" ToRole="ApplicationUser" />
+          <NavigationProperty Name="UserOperationCodeDefine" Relationship="OpenWebSiteModel.FK_UserOperationLog_ToUserOperationCodeDefine" FromRole="UserOperationLog" ToRole="UserOperationCodeDefine" />
+        </EntityType>
+        <Association Name="FK_UserOperationLog_ToApplicationUser">
+          <End Type="OpenWebSiteModel.ApplicationUser" Role="ApplicationUser" Multiplicity="1" />
+          <End Type="OpenWebSiteModel.UserOperationLog" Role="UserOperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ApplicationUser">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="UserOperationLog">
+              <PropertyRef Name="UserId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_UserOperationLog_ToUserOperationCodeDefine">
+          <End Type="OpenWebSiteModel.UserOperationCodeDefine" Role="UserOperationCodeDefine" Multiplicity="1" />
+          <End Type="OpenWebSiteModel.UserOperationLog" Role="UserOperationLog" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="UserOperationCodeDefine">
+              <PropertyRef Name="OpreationCode" />
+            </Principal>
+            <Dependent Role="UserOperationLog">
+              <PropertyRef Name="OpreationCode" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -569,6 +694,13 @@
           <EntitySetMapping Name="ApplicationUser">
             <EntityTypeMapping TypeName="OpenWebSiteModel.ApplicationUser">
               <MappingFragment StoreEntitySet="ApplicationUser">
+                <ScalarProperty Name="ResetPasswordToken" ColumnName="ResetPasswordToken" />
+                <ScalarProperty Name="LockoutEndDate" ColumnName="LockoutEndDate" />
+                <ScalarProperty Name="LockoutEnabled" ColumnName="LockoutEnabled" />
+                <ScalarProperty Name="AccessFailedCount" ColumnName="AccessFailedCount" />
+                <ScalarProperty Name="LastLoginFailTime" ColumnName="LastLoginFailTime" />
+                <ScalarProperty Name="LastUnlockedTime" ColumnName="LastUnlockedTime" />
+                <ScalarProperty Name="LastActivityTime" ColumnName="LastActivityTime" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="UserName" ColumnName="UserName" />
                 <ScalarProperty Name="Password" ColumnName="Password" />
@@ -595,6 +727,7 @@
           <EntitySetMapping Name="ApplicationUserProfile">
             <EntityTypeMapping TypeName="OpenWebSiteModel.ApplicationUserProfile">
               <MappingFragment StoreEntitySet="ApplicationUserProfile">
+                <ScalarProperty Name="DisplayName" ColumnName="DisplayName" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Address" ColumnName="Address" />
                 <ScalarProperty Name="EMail" ColumnName="EMail" />
@@ -623,6 +756,27 @@
                 <ScalarProperty Name="UserId" ColumnName="UserId" />
                 <ScalarProperty Name="RoleId" ColumnName="RoleId" />
                 <ScalarProperty Name="Void" ColumnName="Void" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserOperationCodeDefine">
+            <EntityTypeMapping TypeName="OpenWebSiteModel.UserOperationCodeDefine">
+              <MappingFragment StoreEntitySet="UserOperationCodeDefine">
+                <ScalarProperty Name="MessageResourceKey" ColumnName="MessageResourceKey" />
+                <ScalarProperty Name="Description" ColumnName="Description" />
+                <ScalarProperty Name="OpreationCode" ColumnName="OpreationCode" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="UserOperationLog">
+            <EntityTypeMapping TypeName="OpenWebSiteModel.UserOperationLog">
+              <MappingFragment StoreEntitySet="UserOperationLog">
+                <ScalarProperty Name="UserId" ColumnName="UserId" />
+                <ScalarProperty Name="URL" ColumnName="URL" />
+                <ScalarProperty Name="OpreationCode" ColumnName="OpreationCode" />
+                <ScalarProperty Name="LogTime" ColumnName="LogTime" />
+                <ScalarProperty Name="Body" ColumnName="Body" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

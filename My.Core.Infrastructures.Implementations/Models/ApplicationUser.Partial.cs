@@ -7,6 +7,7 @@ namespace My.Core.Infrastructures.Implementations.Models
     [MetadataType(typeof(ApplicationUserMetaData))]
     public partial class ApplicationUser
     {
+
     }
     
     public partial class ApplicationUserMetaData
@@ -34,6 +35,16 @@ namespace My.Core.Infrastructures.Implementations.Models
         public int LastUpdateUserId { get; set; }
         [Required]
         public System.DateTime LastUpdateTime { get; set; }
+        public Nullable<System.DateTime> LastActivityTime { get; set; }
+        public Nullable<System.DateTime> LastUnlockedTime { get; set; }
+        public Nullable<System.DateTime> LastLoginFailTime { get; set; }
+        [Required]
+        public int AccessFailedCount { get; set; }
+        public Nullable<bool> LockoutEnabled { get; set; }
+        public Nullable<System.DateTime> LockoutEndDate { get; set; }
+        
+        [StringLength(512, ErrorMessage="欄位長度不得大於 512 個字元")]
+        public string ResetPasswordToken { get; set; }
     
         public virtual ICollection<ApplicationUserGroup> ApplicationUserGroup { get; set; }
         public virtual ICollection<ApplicationUserProfileRef> ApplicationUserProfileRef { get; set; }

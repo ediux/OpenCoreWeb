@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -42,13 +42,6 @@
     <Compile Include="IoC\IDIHost.cs" />
     <Compile Include="Logs\ILogWriter.cs" />
     <Compile Include="Base\IServiceBase.cs" />
-    <Compile Include="Datas\IAccount.cs" />
-    <Compile Include="Datas\IUserProfile.cs" />
-    <Compile Include="ViewModels\IApplicationUser.cs" />
-    <Compile Include="Datas\IUserOperationLog.cs" />
-    <Compile Include="Datas\IUserOperationCodeDefine.cs" />
-    <Compile Include="Datas\IApplicationRole.cs" />
-    <Compile Include="Datas\IGroup.cs" />
     <Compile Include="Repositories\IAccountRepository.cs" />
     <Compile Include="Repositories\IApplicationRoleRepository.cs" />
     <Compile Include="Repositories\IGroupRepository.cs" />
@@ -56,14 +49,7 @@
     <Compile Include="Repositories\IUserOperationCodeDefineRepository.cs" />
     <Compile Include="Repositories\IUserOperationLogRepository.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Base\" />
-    <Folder Include="IoC\" />
-    <Folder Include="Logs\" />
-    <Folder Include="Datas\" />
-    <Folder Include="ViewModels\" />
-    <Folder Include="Repositories\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>

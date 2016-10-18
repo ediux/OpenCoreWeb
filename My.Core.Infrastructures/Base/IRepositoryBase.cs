@@ -10,7 +10,7 @@ namespace My.Core.Infrastructures.DAL
 	/// Repository base.
 	/// </summary>
 	public interface IRepositoryBase<T>
-		where T : IDataModel
+		where T : class
 	{
 		/// <summary>
 		/// Gets or sets the logger.
@@ -36,7 +36,7 @@ namespace My.Core.Infrastructures.DAL
 		/// </summary>
 		/// <param name="predicate">要取得的Where條件。</param>
 		/// <returns>取得第一筆符合條件的內容。</returns>
-		T Find(Expression<Func<T, bool>> predicate);
+		T Find(params object[] values);
 
 		/// <summary>
 		/// 取得Entity全部筆數的IQueryable。

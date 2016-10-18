@@ -3,7 +3,8 @@ using My.Core.Infrastructures.DAL;
 
 namespace My.Core.Infrastructures
 {
-	public interface IUserOperationCodeDefineRepository : IRepositoryBase<IUserOperationCodeDefine>
+    public interface IUserOperationCodeDefineRepository<IUserOperationCodeDefine> : IRepositoryBase<IUserOperationCodeDefine>
+        where IUserOperationCodeDefine :class
 	{
 		/// <summary>
 		/// Finds the by code.

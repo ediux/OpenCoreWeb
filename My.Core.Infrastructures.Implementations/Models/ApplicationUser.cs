@@ -20,6 +20,7 @@ namespace My.Core.Infrastructures.Implementations.Models
             this.ApplicationUserGroup = new HashSet<ApplicationUserGroup>();
             this.ApplicationUserProfileRef = new HashSet<ApplicationUserProfileRef>();
             this.ApplicationUserRole = new HashSet<ApplicationUserRole>();
+            this.UserOperationLog = new HashSet<UserOperationLog>();
         }
     
         public int Id { get; set; }
@@ -33,6 +34,13 @@ namespace My.Core.Infrastructures.Implementations.Models
         public System.DateTime CreateTime { get; set; }
         public int LastUpdateUserId { get; set; }
         public System.DateTime LastUpdateTime { get; set; }
+        public Nullable<System.DateTime> LastActivityTime { get; set; }
+        public Nullable<System.DateTime> LastUnlockedTime { get; set; }
+        public Nullable<System.DateTime> LastLoginFailTime { get; set; }
+        public int AccessFailedCount { get; set; }
+        public Nullable<bool> LockoutEnabled { get; set; }
+        public Nullable<System.DateTime> LockoutEndDate { get; set; }
+        public string ResetPasswordToken { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ApplicationUserGroup> ApplicationUserGroup { get; set; }
@@ -40,5 +48,7 @@ namespace My.Core.Infrastructures.Implementations.Models
         public virtual ICollection<ApplicationUserProfileRef> ApplicationUserProfileRef { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ApplicationUserRole> ApplicationUserRole { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<UserOperationLog> UserOperationLog { get; set; }
     }
 }

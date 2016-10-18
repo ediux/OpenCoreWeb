@@ -28,6 +28,7 @@ namespace My.Core.Infrastructures.Implementations.Models
         public bool PhoneConfirmed { get; set; }
         public System.DateTime CreateTime { get; set; }
         public System.DateTime LastUpdateTime { get; set; }
+        public string DisplayName { get; set; }
     
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ApplicationUserProfileRef> ApplicationUserProfileRef { get; set; }

@@ -4,14 +4,15 @@ namespace My.Core.Infrastructures.DAL
 	/// <summary>
 	/// Unitof work.
 	/// </summary>
-	public interface IUnitofWork : IDisposable
+	public interface IUnitofWork<TDbContext> : IDisposable
+        where TDbContext : class
 	{
 		/// <summary>
 		/// 取得資料庫物件執行個體。
 		/// </summary>
 		/// <returns>The database object.</returns>
-		/// <typeparam name="TDb">The 1st type parameter.</typeparam>
-		TDb GetDatabaseObject<TDb>() where TDb : class;
+        /// <typeparam name="TDbContext">The 1st type parameter.</typeparam>
+        TDbContext GetDatabaseObject<TDbContext>();
 		/// <summary>
 		/// Gets the entity.
 		/// </summary>
@@ -23,7 +24,7 @@ namespace My.Core.Infrastructures.DAL
 		/// </summary>
 		/// <returns>The repository.</returns>
 		/// <typeparam name="TEntity">The 1st type parameter.</typeparam>
-		IRepositoryBase<TEntity> GetRepository<TEntity>() where TEntity : IDataModel;
+		IRepositoryBase<TEntity> GetRepository<TEntity>() where TEntity : class;
 		/// <summary>
 		/// Begins the transcation.
 		/// </summary>

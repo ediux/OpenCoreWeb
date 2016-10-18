@@ -33,5 +33,7 @@ namespace My.Core.Infrastructures.Implementations.Models
         public virtual DbSet<ApplicationUserProfile> ApplicationUserProfile { get; set; }
         public virtual DbSet<ApplicationUserProfileRef> ApplicationUserProfileRef { get; set; }
         public virtual DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
+        public virtual DbSet<UserOperationCodeDefine> UserOperationCodeDefine { get; set; }
+        public virtual DbSet<UserOperationLog> UserOperationLog { get; set; }
     }
 }

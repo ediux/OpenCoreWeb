@@ -54,7 +54,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\ApplicationDbModel.Context.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -85,6 +84,9 @@
     <Compile Include="Models\ApplicationRole.Partial.cs">
       <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ApplicationUser.cs">
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\ApplicationUser.Partial.cs">
       <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
     </Compile>
@@ -112,15 +114,24 @@
       <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
     </Compile>
     <Compile Include="Models\OpenWebSiteEntities.partial.cs" />
+    <Compile Include="Models\UserOperationCodeDefine.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UserOperationCodeDefine.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UserOperationLog.cs">
+      <SubType>Code</SubType>
+      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\UserOperationLog.Partial.cs">
+      <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\ApplicationRole.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Models\ApplicationUser.cs">
-      <DependentUpon>ApplicationDbModel.tt</DependentUpon>
-    </Compile>
-    <Compile Include="Models\UserOperationCodeDefine.cs" />
-    <Compile Include="Models\UserOperationLog.cs" />
     <Compile Include="Models\ApplicationUserGroup.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
     </Compile>

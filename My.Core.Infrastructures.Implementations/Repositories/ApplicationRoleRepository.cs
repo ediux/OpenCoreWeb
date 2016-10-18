@@ -4,10 +4,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using My.Core.Infrastructures.DAL;
 using My.Core.Infrastructures.Logs;
+using My.Core.Infrastructures.Implementations.Models;
 
 namespace My.Core.Infrastructures.Implementations
 {
-	public class ApplicationRoleRepository:IApplicationRoleRepository
+	public class ApplicationRoleRepository:IApplicationRoleRepository<ApplicationRole>
 	{
 		public ApplicationRoleRepository()
 		{
@@ -31,42 +32,42 @@ namespace My.Core.Infrastructures.Implementations
 			throw new NotImplementedException();
 		}
 
-		public IList<IApplicationRole> BatchCreate(IEnumerable<IApplicationRole> entities)
+		public IList<ApplicationRole> BatchCreate(IEnumerable<ApplicationRole> entities)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IApplicationRole Create(IApplicationRole entity)
+		public ApplicationRole Create(ApplicationRole entity)
 		{
 			throw new NotImplementedException();
 		}
 
-		public void Delete(IApplicationRole entity)
+		public void Delete(ApplicationRole entity)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IApplicationRole Find(Expression<Func<IApplicationRole, bool>> predicate)
+		public ApplicationRole Find(params object[] values)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IQueryable<IApplicationRole> FindAll()
+		public IQueryable<ApplicationRole> FindAll()
 		{
 			throw new NotImplementedException();
 		}
 
-		public IApplicationRole FindById(int RoleId)
+		public ApplicationRole FindById(int RoleId)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IApplicationRole FindByName(string roleName)
+		public ApplicationRole FindByName(string roleName)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IList<IApplicationRole> FindByUser(int MemberId)
+		public IList<ApplicationRole> FindByUser(int MemberId)
 		{
 			throw new NotImplementedException();
 		}
@@ -86,12 +87,12 @@ namespace My.Core.Infrastructures.Implementations
 			throw new NotImplementedException();
 		}
 
-		public IList<IApplicationRole> ToList(IQueryable<IApplicationRole> source)
+		public IList<ApplicationRole> ToList(IQueryable<ApplicationRole> source)
 		{
 			throw new NotImplementedException();
 		}
 
-		public IApplicationRole Update(IApplicationRole entity)
+		public ApplicationRole Update(ApplicationRole entity)
 		{
 			throw new NotImplementedException();
 		}

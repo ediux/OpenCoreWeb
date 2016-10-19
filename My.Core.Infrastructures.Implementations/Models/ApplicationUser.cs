@@ -21,6 +21,7 @@ namespace My.Core.Infrastructures.Implementations.Models
             this.ApplicationUserProfileRef = new HashSet<ApplicationUserProfileRef>();
             this.ApplicationUserRole = new HashSet<ApplicationUserRole>();
             this.UserOperationLog = new HashSet<UserOperationLog>();
+            this.ApplicationUserLogin = new HashSet<ApplicationUserLogin>();
         }
     
         public int Id { get; set; }
@@ -51,6 +52,7 @@ namespace My.Core.Infrastructures.Implementations.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<UserOperationLog> UserOperationLog { get; set; }
         public virtual ApplicationUserClaim ApplicationUserClaim { get; set; }
-        public virtual ApplicationUserLogin ApplicationUserLogin { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ApplicationUserLogin> ApplicationUserLogin { get; set; }
     }
 }

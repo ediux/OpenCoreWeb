@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using System.Linq;
 using My.Core.Infrastructures.Implementations.Models;
 using System;
 using System.Runtime.InteropServices;
@@ -39,50 +40,72 @@ namespace OpenCoreWeb.Models
     //}
 
     public class OpenCoreWebUserStore : IUserStore<ApplicationUser, int>
-        , IUserRoleStore<ApplicationUser, int>, IRoleStore<ApplicationRole,int>
+        , IUserRoleStore<ApplicationUser, int>, IRoleStore<ApplicationRole, int>
         , IUserEmailStore<ApplicationUser, int>, IUserLockoutStore<ApplicationUser, int>
         , IUserLoginStore<ApplicationUser, int>, IUserPasswordStore<ApplicationUser, int>
-        , IUserPhoneNumberStore<ApplicationUser, int>, IUserSecurityStampStore<ApplicationUser, int>,
-        IUserTokenProvider<ApplicationUser, int>, IUserTwoFactorStore<ApplicationUser, int>
+        , IUserPhoneNumberStore<ApplicationUser, int>, IUserSecurityStampStore<ApplicationUser, int>
+        , IUserTwoFactorStore<ApplicationUser, int>
+        , IQueryableUserStore<ApplicationUser, int>, IQueryableRoleStore<ApplicationRole, int>
     {
-       
+
         private bool disposed = false;
         SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
         IUnitofWork uow;
-        IAccountRepository<ApplicationUser> accountrepo;
+        IApplicationUserRepository<ApplicationUser> accountrepo;
+        IApplicationRoleRepository<ApplicationRole> rolerepo;
+
 
         public OpenCoreWebUserStore(DbContext context)
         {
             uow = (OpenWebSiteEntities)context;
-            accountrepo = uow.GetRepository<ApplicationUser>() as IAccountRepository<ApplicationUser>;
+            accountrepo = uow.GetRepository<ApplicationUserRepository, ApplicationUser>();
+            rolerepo = uow.GetRepository<ApplicationRoleRepository, ApplicationRole>();
         }
 
         #region 使用者
         public Task CreateAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                accountrepo.Create(user);
+                accountrepo.SaveChanges();
+            });
         }
 
         public Task DeleteAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                accountrepo.Delete(user);
+                accountrepo.SaveChanges();
+            });
         }
 
         public Task<ApplicationUser> FindByIdAsync(int userId)
         {
-            throw new System.NotImplementedException();
+            return new Task<ApplicationUser>(() =>
+            {
+                return accountrepo.FindUserById(userId, false);
+            });
         }
 
         public Task<ApplicationUser> FindByNameAsync(string userName)
         {
-            throw new System.NotImplementedException();
+            return new Task<ApplicationUser>(() =>
+            {
+                return accountrepo.FindUserByLoginAccount(userName, false);
+            });
         }
 
         public Task UpdateAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
-       
+
         public void Dispose()
         {
             Dispose(true);
@@ -111,108 +134,239 @@ namespace OpenCoreWeb.Models
         #region User Role Store
         public Task AddToRoleAsync(ApplicationUser user, string roleName)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                int roleid = rolerepo.FindByName(roleName).Id;
+                rolerepo.AddUserToRole(roleid, user.Id);
+                rolerepo.SaveChanges();
+            });
         }
 
         public Task<System.Collections.Generic.IList<string>> GetRolesAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<System.Collections.Generic.IList<string>>(() =>
+            {
+                var roles = from q in user.ApplicationUserRole
+                            select q.ApplicationRole.Name;
+                return roles.ToList();
+            });
         }
 
         public Task<bool> IsInRoleAsync(ApplicationUser user, string roleName)
         {
-            throw new System.NotImplementedException();
+            return new Task<bool>(() =>
+            {
+                var userinroles = from q in user.ApplicationUserRole
+                                  where q.ApplicationRole.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase)
+                                  select q;
+                return userinroles.Any();
+            });
         }
 
         public Task RemoveFromRoleAsync(ApplicationUser user, string roleName)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                var userinroles = (from q in user.ApplicationUserRole
+                                   where q.ApplicationRole.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase)
+                                   select q).Single();
+
+                user.ApplicationUserRole.Remove(userinroles);
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
         #endregion
 
         #region EMail Stroe
         public Task<ApplicationUser> FindByEmailAsync(string email)
         {
-            throw new System.NotImplementedException();
+            return new Task<ApplicationUser>(() =>
+            {
+                var findemail = accountrepo.FindByEmail(email);
+                return findemail;
+            });
         }
 
         public Task<string> GetEmailAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<string>(() =>
+            {
+                var userinroles = (from q in user.ApplicationUserProfileRef
+                                   select q.ApplicationUserProfile.EMail);
+                return string.Join(";", userinroles.ToArray());
+            });
         }
 
         public Task<bool> GetEmailConfirmedAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<bool>(() =>
+            {
+                var userinroles = (from q in user.ApplicationUserProfileRef
+                                   select q.ApplicationUserProfile.EMailConfirmed);
+                return userinroles.Single();
+            });
         }
 
         public Task SetEmailAsync(ApplicationUser user, string email)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                var useremail = user.ApplicationUserProfileRef.Single();
+                useremail.ApplicationUserProfile.EMail = email;
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
 
         public Task SetEmailConfirmedAsync(ApplicationUser user, bool confirmed)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                var useremail = user.ApplicationUserProfileRef.Single();
+                useremail.ApplicationUserProfile.EMailConfirmed = confirmed;
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
         #endregion
 
         #region Lockout Store
         public Task<int> GetAccessFailedCountAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<int>(() =>
+            {
+                return user.AccessFailedCount;
+            });
         }
 
         public Task<bool> GetLockoutEnabledAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<bool>(() =>
+            {
+                return user.LockoutEnabled.HasValue ? user.LockoutEnabled.Value : false;
+            });
         }
 
         public Task<System.DateTimeOffset> GetLockoutEndDateAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<System.DateTimeOffset>(() =>
+            {
+                return user.LockoutEndDate.HasValue ? user.LockoutEndDate.Value : new System.DateTimeOffset(new DateTime(1754, 1, 1).ToUniversalTime());
+            });
         }
 
         public Task<int> IncrementAccessFailedCountAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<int>(() =>
+            {
+                user.AccessFailedCount += 1;
+                user.LastActivityTime = user.LastUpdateTime = DateTime.Now;
+                user.LastUpdateUserId = user.Id;
+                user = accountrepo.Update(user);
+                accountrepo.SaveChanges();
+                return user.AccessFailedCount;
+            });
         }
 
         public Task ResetAccessFailedCountAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                user.AccessFailedCount = 0;
+                user.LastActivityTime = user.LastUpdateTime = DateTime.Now;
+                user.LastUpdateUserId = user.Id;
+                user.LockoutEnabled = false;
+                user.LockoutEndDate = DateTime.Now;
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
 
         public Task SetLockoutEnabledAsync(ApplicationUser user, bool enabled)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                user.AccessFailedCount = 0;
+                user.LastActivityTime = user.LastUpdateTime = DateTime.Now;
+                user.LastUpdateUserId = user.Id;
+                user.LockoutEnabled = enabled;
+
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
 
         public Task SetLockoutEndDateAsync(ApplicationUser user, System.DateTimeOffset lockoutEnd)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                user.AccessFailedCount = 0;
+                user.LastActivityTime = user.LastUpdateTime = DateTime.Now;
+                user.LastUpdateUserId = user.Id;
+                user.LockoutEndDate = new DateTime(lockoutEnd.Ticks);
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
         #endregion
 
         #region Login Store
         public Task AddLoginAsync(ApplicationUser user, UserLoginInfo login)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                user.ApplicationUserLogin.Add(new ApplicationUserLogin()
+                {
+                    LoginProvider = login.LoginProvider,
+                    ProviderKey = login.ProviderKey,
+                    UserId = user.Id
+                });
+
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
 
         public Task<ApplicationUser> FindAsync(UserLoginInfo login)
         {
-            throw new System.NotImplementedException();
+            return new Task<ApplicationUser>(() =>
+            {
+                var founduser = from q in accountrepo.FindAll()
+                                from l in q.ApplicationUserLogin
+                                where l.LoginProvider == login.LoginProvider
+                                && l.ProviderKey == login.ProviderKey
+                                select q;
+
+                return founduser.SingleOrDefault();
+            });
         }
 
         public Task<System.Collections.Generic.IList<UserLoginInfo>> GetLoginsAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<System.Collections.Generic.IList<UserLoginInfo>>(() =>
+            {
+                var founduser = from q in accountrepo.FindAll()
+                                from l in q.ApplicationUserLogin
+                                select new UserLoginInfo(l.LoginProvider, l.ProviderKey);
+
+                return founduser.ToList();
+            });
         }
 
         public Task RemoveLoginAsync(ApplicationUser user, UserLoginInfo login)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                var foundlogininfo = (from q in user.ApplicationUserLogin
+                                     where q.LoginProvider == login.LoginProvider
+                                     && q.ProviderKey == login.ProviderKey
+                                     select q).Single();
+
+                user.ApplicationUserLogin.Remove(foundlogininfo);
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
         #endregion
 
@@ -267,28 +421,6 @@ namespace OpenCoreWeb.Models
         }
         #endregion
 
-        #region Token Provider
-        public Task<string> GenerateAsync(string purpose, UserManager<ApplicationUser, int> manager, ApplicationUser user)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task<bool> IsValidProviderForUserAsync(UserManager<ApplicationUser, int> manager, ApplicationUser user)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task NotifyAsync(string token, UserManager<ApplicationUser, int> manager, ApplicationUser user)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public Task<bool> ValidateAsync(string purpose, string token, UserManager<ApplicationUser, int> manager, ApplicationUser user)
-        {
-            throw new System.NotImplementedException();
-        }
-        #endregion
-
         #region TwoFactor
         public Task<bool> GetTwoFactorEnabledAsync(ApplicationUser user)
         {
@@ -298,7 +430,7 @@ namespace OpenCoreWeb.Models
         public Task SetTwoFactorEnabledAsync(ApplicationUser user, bool enabled)
         {
             throw new System.NotImplementedException();
-        } 
+        }
         #endregion
 
         #region Role Store
@@ -325,7 +457,23 @@ namespace OpenCoreWeb.Models
         public Task UpdateAsync(ApplicationRole role)
         {
             throw new System.NotImplementedException();
-        } 
+        }
         #endregion
+
+        #region 可用來查詢的使用者清單屬性
+        public System.Linq.IQueryable<ApplicationUser> Users
+        {
+            get { return uow.GetEntity<ApplicationUser>(); }
+        }
+        #endregion
+
+        #region 可用來查詢的角色清單
+        public System.Linq.IQueryable<ApplicationRole> Roles
+        {
+            get { return uow.GetEntity<ApplicationRole>(); }
+        }
+        #endregion
+
+
     }
 }

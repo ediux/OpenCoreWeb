@@ -10,7 +10,7 @@
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationRole" Width="1.5" PointX="0.75" PointY="15.75" IsExpanded="true" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUser" Width="1.5" PointX="0.75" PointY="7" IsExpanded="true" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserGroup" Width="1.5" PointX="3" PointY="0.75" IsExpanded="true" />
-        <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserProfile" Width="1.5" PointX="0.75" PointY="12.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserProfile" Width="1.5" PointX="0.625" PointY="13" IsExpanded="true" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserProfileRef" Width="1.5" PointX="3" PointY="7.75" IsExpanded="true" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserRole" Width="1.5" PointX="3" PointY="10.875" IsExpanded="true" />
         <AssociationConnector Association="OpenWebSiteModel.FK_ApplicationGroupTree_ToApplicationGroup_Child" ManuallyRouted="false" />
@@ -27,8 +27,8 @@
         <AssociationConnector Association="OpenWebSiteModel.FK_UserOperationLog_ToApplicationUser" />
         <AssociationConnector Association="OpenWebSiteModel.FK_UserOperationLog_ToUserOperationCodeDefine" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserClaim" Width="1.5" PointX="3" PointY="16.5" />
-        <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserLogin" Width="1.5" PointX="3" PointY="19.125" />
         <AssociationConnector Association="OpenWebSiteModel.FK_ApplicationUserClaim_ToApplicationUser" />
+        <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserLogin" Width="1.5" PointX="3" PointY="19.875" />
         <AssociationConnector Association="OpenWebSiteModel.FK_ApplicationUserLogin_ToApplicationUser" />
       </Diagram>
     </edmx:Diagrams>

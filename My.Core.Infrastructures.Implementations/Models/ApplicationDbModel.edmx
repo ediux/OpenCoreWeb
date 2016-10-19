@@ -84,11 +84,12 @@
         </EntityType>
         <EntityType Name="ApplicationUserLogin">
           <Key>
-            <PropertyRef Name="UserId" />
+            <PropertyRef Name="LoginProvider" />
+            <PropertyRef Name="ProviderKey" />
           </Key>
           <Property Name="UserId" Type="int" Nullable="false" />
-          <Property Name="LoginProvider" Type="nvarchar" MaxLength="512" />
-          <Property Name="ProviderKey" Type="nvarchar" MaxLength="512" />
+          <Property Name="LoginProvider" Type="nvarchar" MaxLength="512" Nullable="false" />
+          <Property Name="ProviderKey" Type="nvarchar" MaxLength="512" Nullable="false" />
         </EntityType>
         <EntityType Name="ApplicationUserProfile">
           <Key>
@@ -217,7 +218,7 @@
         </Association>
         <Association Name="FK_ApplicationUserLogin_ToApplicationUser">
           <End Role="ApplicationUser" Type="Self.ApplicationUser" Multiplicity="1" />
-          <End Role="ApplicationUserLogin" Type="Self.ApplicationUserLogin" Multiplicity="0..1" />
+          <End Role="ApplicationUserLogin" Type="Self.ApplicationUserLogin" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="ApplicationUser">
               <PropertyRef Name="Id" />
@@ -656,11 +657,11 @@
             <End Role="UserOperationLog" EntitySet="UserOperationLog" />
           </AssociationSet>
           <EntitySet Name="ApplicationUserClaim" EntityType="OpenWebSiteModel.ApplicationUserClaim" />
-          <EntitySet Name="ApplicationUserLogin" EntityType="OpenWebSiteModel.ApplicationUserLogin" />
           <AssociationSet Name="FK_ApplicationUserClaim_ToApplicationUser" Association="OpenWebSiteModel.FK_ApplicationUserClaim_ToApplicationUser">
             <End Role="ApplicationUser" EntitySet="ApplicationUser" />
             <End Role="ApplicationUserClaim" EntitySet="ApplicationUserClaim" />
           </AssociationSet>
+          <EntitySet Name="ApplicationUserLogin" EntityType="OpenWebSiteModel.ApplicationUserLogin" />
           <AssociationSet Name="FK_ApplicationUserLogin_ToApplicationUser" Association="OpenWebSiteModel.FK_ApplicationUserLogin_ToApplicationUser">
             <End Role="ApplicationUser" EntitySet="ApplicationUser" />
             <End Role="ApplicationUserLogin" EntitySet="ApplicationUserLogin" />
@@ -722,15 +723,6 @@
           <Property Name="ClaimValue" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="ApplicationUser" Relationship="OpenWebSiteModel.FK_ApplicationUserClaim_ToApplicationUser" FromRole="ApplicationUserClaim" ToRole="ApplicationUser" />
         </EntityType>
-        <EntityType Name="ApplicationUserLogin">
-          <Key>
-            <PropertyRef Name="UserId" />
-          </Key>
-          <Property Name="UserId" Type="Int32" Nullable="false" />
-          <Property Name="LoginProvider" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
-          <Property Name="ProviderKey" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="ApplicationUser" Relationship="OpenWebSiteModel.FK_ApplicationUserLogin_ToApplicationUser" FromRole="ApplicationUserLogin" ToRole="ApplicationUser" />
-        </EntityType>
         <Association Name="FK_ApplicationUserClaim_ToApplicationUser">
           <End Type="OpenWebSiteModel.ApplicationUser" Role="ApplicationUser" Multiplicity="1" />
           <End Type="OpenWebSiteModel.ApplicationUserClaim" Role="ApplicationUserClaim" Multiplicity="0..1" />
@@ -743,9 +735,19 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <EntityType Name="ApplicationUserLogin">
+          <Key>
+            <PropertyRef Name="LoginProvider" />
+            <PropertyRef Name="ProviderKey" />
+          </Key>
+          <Property Name="UserId" Type="Int32" Nullable="false" />
+          <Property Name="LoginProvider" Type="String" Nullable="false" MaxLength="512" FixedLength="false" Unicode="true" />
+          <Property Name="ProviderKey" Type="String" Nullable="false" MaxLength="512" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="ApplicationUser" Relationship="OpenWebSiteModel.FK_ApplicationUserLogin_ToApplicationUser" FromRole="ApplicationUserLogin" ToRole="ApplicationUser" />
+        </EntityType>
         <Association Name="FK_ApplicationUserLogin_ToApplicationUser">
           <End Type="OpenWebSiteModel.ApplicationUser" Role="ApplicationUser" Multiplicity="1" />
-          <End Type="OpenWebSiteModel.ApplicationUserLogin" Role="ApplicationUserLogin" Multiplicity="0..1" />
+          <End Type="OpenWebSiteModel.ApplicationUserLogin" Role="ApplicationUserLogin" Multiplicity="*" />
           <ReferentialConstraint>
             <Principal Role="ApplicationUser">
               <PropertyRef Name="Id" />

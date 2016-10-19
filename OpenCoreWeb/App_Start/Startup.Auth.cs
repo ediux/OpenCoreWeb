@@ -6,7 +6,7 @@ using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
 using My.Core.Infrastructures.Implementations.Models;
-
+using System.Data.Entity;
 namespace OpenCoreWeb
 {
     public partial class Startup
@@ -14,6 +14,8 @@ namespace OpenCoreWeb
         // 如需設定驗證的詳細資訊，請瀏覽 http://go.microsoft.com/fwlink/?LinkId=301864
         public void ConfigureAuth(IAppBuilder app)
         {
+
+
             // 設定資料庫內容、使用者管理員和登入管理員，以針對每個要求使用單一執行個體
             app.CreatePerOwinContext(OpenWebSiteEntities.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);

@@ -12,33 +12,16 @@ using Microsoft.AspNet.Identity;
 
 namespace My.Core.Infrastructures.Implementations
 {
-    public class AccountRepository : IAccountRepository<ApplicationUser>
+    public class ApplicationUserRepository : RepositoryBase<ApplicationUser>, IApplicationUserRepository<ApplicationUser>
     {
-        private IUnitofWork _unitofwork;
 
-        private DbSet<ApplicationUser> _datatable;
 
-        public AccountRepository(IUnitofWork unitofwork)
+        public ApplicationUserRepository(IUnitofWork unitofwork)
+            : base(unitofwork)
         {
-            _unitofwork = unitofwork;
-            _datatable = _unitofwork.GetEntity<ApplicationUser>() as DbSet<ApplicationUser>;
         }
 
         #region Helper Functions
-
-        /// <summary>
-        /// Writes the error log.
-        /// </summary>
-        /// <returns>The error log.</returns>
-        /// <param name="ex">Ex.</param>
-        protected virtual void WriteErrorLog(Exception ex)
-        {
-            if (_logger != null)
-            {
-                _logger.ErrorFormat("{0},{1}", ex.Message, ex.StackTrace);
-            }
-        }
-
         /// <summary>
         /// Writes the user operation log.
         /// </summary>
@@ -78,6 +61,10 @@ namespace My.Core.Infrastructures.Implementations
                     OpreationCode = (int)code,
                     URL = _url
                 });
+
+
+                //_unitofwork.GetEntry<ApplicationUser>(User).State = EntityState.Modified;
+
             }
             catch (Exception ex)
             {
@@ -92,7 +79,7 @@ namespace My.Core.Infrastructures.Implementations
             {
                 return System.Web.HttpContext.Current.User.Identity.GetUserId<int>();
             }
-          
+
             return -1;
         }
 
@@ -124,40 +111,22 @@ namespace My.Core.Infrastructures.Implementations
         }
         #endregion
 
-        #region Logger 記錄器
-        private ILogWriter _logger;
-
-        /// <summary>
-        /// Gets or sets the logger.
-        /// </summary>
-        /// <value>The logger.</value>
-        public ILogWriter Logger
+        public override IList<ApplicationUser> BatchCreate(IEnumerable<ApplicationUser> entities)
         {
-            get
-            {
-                return _logger;
-            }
-
-            set
-            {
-                _logger = value;
-            }
-        }
-        #endregion
-
-        public IList<ApplicationUser> BatchCreate(IEnumerable<ApplicationUser> entities)
-        {
+            var currentLoginedUser = Find(GetCurrentLoginedUserId());
             try
             {
-                IList<ApplicationUser> result = ((DbSet<ApplicationUser>)_datatable).AddRange(entities).ToList();
-                SaveChanges();
+                WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Start, currentLoginedUser);
+                var result = base.BatchCreate(entities);
+                WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_End_Success, currentLoginedUser);
+
                 return result;
             }
             catch (Exception ex)
             {
                 WriteErrorLog(ex);
-
-                WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Rollback, new ApplicationUser() { Id = -1 });
+                WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Rollback, currentLoginedUser);
+                WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_End_Fail, currentLoginedUser);
                 throw ex;
             }
 
@@ -165,54 +134,57 @@ namespace My.Core.Infrastructures.Implementations
 
         public ApplicationUser ChangePassword(ApplicationUser UpdatedUserData)
         {
+            var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
             try
             {
-                WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, UpdatedUserData);
+                WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, currentLoginedUser);
 
                 ApplicationUser _updateduser = Update(UpdatedUserData);
 
-
+                WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Success, currentLoginedUser);
                 return _updateduser;
             }
             catch (Exception ex)
             {
                 WriteErrorLog(ex);
-                WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Fail, UpdatedUserData);
+                WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Fail, currentLoginedUser);
                 throw ex;
             }
 
         }
 
-        public ApplicationUser Create(ApplicationUser entity)
+        public override ApplicationUser Create(ApplicationUser entity)
         {
+            var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
             try
             {
-                WriteUserOperationLog(OperationCodeEnum.Account_Create_Start, entity);
-                ApplicationUser inserteduser = _datatable.Add((ApplicationUser)entity);
+                WriteUserOperationLog(OperationCodeEnum.Account_Create_Start, currentLoginedUser);
+                entity = base.Create(entity);
+                WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Success, currentLoginedUser);
 
-                SaveChanges();
-                WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Success, inserteduser);
-                return inserteduser;
+                return entity;
             }
             catch (Exception ex)
             {
                 WriteErrorLog(ex);
-                WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Fail, entity);
-                WriteUserOperationLog(OperationCodeEnum.Account_Create_Rollback, entity);
+                WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Fail, currentLoginedUser);
+                WriteUserOperationLog(OperationCodeEnum.Account_Create_Rollback, currentLoginedUser);
                 throw ex;
             }
 
         }
 
-        public void Delete(ApplicationUser entity)
+        public override void Delete(ApplicationUser entity)
         {
+            var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
             try
             {
                 WriteUserOperationLog(OperationCodeEnum.Account_Delete_Start, entity);
-                ApplicationUser founduser = Find(entity.Id);
-                _datatable.Remove(founduser);
+                base.Delete(entity);
                 WriteUserOperationLog(OperationCodeEnum.Account_Delete_End_Success, entity);
-                SaveChanges();
             }
             catch (Exception ex)
             {
@@ -224,26 +196,7 @@ namespace My.Core.Infrastructures.Implementations
 
         }
 
-        public ApplicationUser Find(params object[] values)
-        {
-
-            ApplicationUser _currentexecutinguser = null;
-
-            try
-            {
-                _currentexecutinguser = _datatable.Find(values);
-                return _currentexecutinguser;
-            }
-            catch (Exception ex)
-            {
-                WriteErrorLog(ex);
-                WriteUserOperationLog(OperationCodeEnum.Accpimt_Find_End_Fail, _currentexecutinguser);
-                throw ex;
-            }
-
-        }
-
-        public IQueryable<ApplicationUser> FindAll()
+        public override IQueryable<ApplicationUser> FindAll()
         {
             try
             {
@@ -276,6 +229,7 @@ namespace My.Core.Infrastructures.Implementations
 
         public ApplicationUser FindByEmail(string email)
         {
+            var currentLoginedUser = Find(GetCurrentLoginedUserId());
             try
             {
                 IQueryable<ApplicationUser> queryset = _datatable.Include(i => i.ApplicationUserProfileRef);
@@ -293,7 +247,7 @@ namespace My.Core.Infrastructures.Implementations
             catch (Exception ex)
             {
                 WriteErrorLog(ex);
-                WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_End_Fail, null);
+                WriteUserOperationLog(OperationCodeEnum.Account_FindByEmail_End_Fail, currentLoginedUser);
                 throw ex;
             }
 
@@ -303,6 +257,7 @@ namespace My.Core.Infrastructures.Implementations
         {
             try
             {
+
                 ApplicationUser _founduser = Find(MemberId);
 
                 if (_founduser != null)
@@ -343,6 +298,7 @@ namespace My.Core.Infrastructures.Implementations
 
         public ApplicationUser FindUserByLoginAccount(string LoginAccount, bool IsOnline)
         {
+            var currentLoginedUser = Find(GetCurrentLoginedUserId());
             try
             {
                 ApplicationUser _founduser = null;
@@ -356,12 +312,13 @@ namespace My.Core.Infrastructures.Implementations
 
                 if (IsOnline)
                 {
-                    WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Online, _founduser);
-                    WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, _founduser);
+                    WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Online, currentLoginedUser);
+                    _founduser.LastActivityTime = DateTime.Now;
+                    Update(_founduser);
                 }
                 else
                 {
-                    WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Offline, _founduser);
+                    WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Offline, currentLoginedUser);
                 }
                 return _founduser;
             }
@@ -374,18 +331,19 @@ namespace My.Core.Infrastructures.Implementations
 
         }
 
-        public int FindUserIdFromPasswordResetToken(string Token)
+        public int FindUserIdFromPasswordResetToken(string Token, out ApplicationUser user)
         {
             try
             {
-                ApplicationUser _founduser = null;
+               
 
                 var result = from q in _datatable
                              where q.ResetPasswordToken.Equals(Token, StringComparison.InvariantCulture)
                              select q;
 
-                _founduser = result.Single();
-                return _founduser.Id;
+                 user = result.SingleOrDefault();
+
+                 return user.Id;
             }
             catch (Exception ex)
             {
@@ -425,13 +383,13 @@ namespace My.Core.Infrastructures.Implementations
         {
             try
             {
-                int _memberid = FindUserIdFromPasswordResetToken(Token);
-                ApplicationUser _founduser = FindUserById(_memberid, GetIsOnline(_memberid));
+                ApplicationUser _founduser = null;
+                int _memberid = FindUserIdFromPasswordResetToken(Token, out _founduser);
+
                 if (_founduser != null)
                 {
-
                     _founduser.Password = newPassword;
-
+                    Update(_founduser);
                     return (int)OperationCodeEnum.Account_ChangePassword_End_Success;
                 }
                 return (int)OperationCodeEnum.Account_ChangePassword_End_Fail;
@@ -444,59 +402,24 @@ namespace My.Core.Infrastructures.Implementations
 
         }
 
-        public void SaveChanges()
-        {
-            _unitofwork.SaveChanges();
-        }
 
-        public IList<ApplicationUser> ToList(IQueryable<ApplicationUser> source)
-        {
-            try
-            {
-                return source.ToList();
-            }
-            catch (Exception ex)
-            {
-                WriteErrorLog(ex);
-                throw ex;
-            }
-
-        }
 
         public ApplicationUser Update(ApplicationUser entity)
         {
+            var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
             try
             {
-                ApplicationUser _founduser = Find(entity.Id);
-
-                if (entity.Password != _founduser.Password
-                    || entity.PasswordHash != _founduser.PasswordHash)
-                {
-                    WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_Start, entity);
-                    _founduser.Password = entity.Password;
-                    _founduser.PasswordHash = entity.PasswordHash;
-                    _founduser.LastUpdateTime = DateTime.Now;
-                    _founduser.LastUpdateUserId = GetCurrentLoginedUserId();
-                    WriteUserOperationLog(OperationCodeEnum.Account_ChangePassword_End_Success, entity);
-                }
-                //_unitofwork.BeginTranscation();
-                ////_founduser.DisplayName = entity.DisplayName;
-                //_founduser.Password = entity.Password;
-                //_founduser.PasswordHash = entity.PasswordHash;
-                //_founduser.ResetPasswordToken = entity.ResetPasswordToken;
-                //_founduser.SecurityStamp = entity.SecurityStamp;
-                //_founduser.TwoFactorEnabled = entity.TwoFactorEnabled;
-                //_founduser.UserName = entity.UserName;
-                //_founduser.Void = entity.Void;
-                //_founduser.ResetPasswordToken = entity.ResetPasswordToken;
-
-                SaveChanges();
-
-                return FindUserById(entity.Id, true);
+                WriteUserOperationLog(OperationCodeEnum.Account_Update_Start, currentLoginedUser);
+                base.Update(entity);
+                WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, currentLoginedUser);
+                return entity;
             }
             catch (Exception ex)
             {
                 WriteErrorLog(ex);
+                WriteUserOperationLog(OperationCodeEnum.Account_Update_Rollback, currentLoginedUser);
+                WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Fail, currentLoginedUser);
                 throw ex;
             }
 
@@ -507,15 +430,16 @@ namespace My.Core.Infrastructures.Implementations
             try
             {
                 ApplicationUser _validatedUser = null;
+
                 var result = from w in _datatable
-                             where w.UserName == UserDataToValidated.UserName &&
-                         (UserDataToValidated.Password == w.Password || UserDataToValidated.PasswordHash == w.PasswordHash)
+                             where w.UserName == UserDataToValidated.UserName
                              select w;
 
                 _validatedUser = result.SingleOrDefault();
 
                 if (_validatedUser != null)
-                    return true;
+                    return (UserDataToValidated.Password == _validatedUser.Password ||
+                        UserDataToValidated.PasswordHash == _validatedUser.PasswordHash);
 
                 return false;
 
@@ -525,27 +449,6 @@ namespace My.Core.Infrastructures.Implementations
                 WriteErrorLog(ex);
                 throw ex;
             }
-
-        }
-
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-        private bool disposed = false;
-        SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!disposed)
-            {
-                if (disposing)
-                {
-                    _unitofwork.Dispose();
-                }
-            }
-
-            disposed = true;
 
         }
     }

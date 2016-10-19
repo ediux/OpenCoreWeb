@@ -4,7 +4,7 @@ using My.Core.Infrastructures.DAL;
 
 namespace My.Core.Infrastructures
 {
-    public interface IAccountRepository<IAccount> : IRepositoryBase<IAccount> where IAccount : class
+    public interface IApplicationUserRepository<IAccount> : IRepositoryBase<IAccount> where IAccount : class
 	{
 		/// <summary>
 		/// 取得所有系統內帳號！
@@ -40,7 +40,7 @@ namespace My.Core.Infrastructures
 		/// </summary>
 		/// <param name="Token"></param>
 		/// <returns></returns>
-		int FindUserIdFromPasswordResetToken(string Token);
+		int FindUserIdFromPasswordResetToken(string Token, out IAccount user);
 
 		/// <summary>
 		/// 傳回使用者是否已被確認是本人建立？？

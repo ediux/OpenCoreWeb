@@ -50,7 +50,14 @@ namespace My.Core.Infrastructures.DAL
 		/// <param name="entity">要更新的內容</param>
 		T Update(T entity);
 
-		/// <summary>
+        /// <summary>
+        /// 一次新增多筆資料。
+        /// </summary>
+        /// <param name="updatedEntities"></param>
+        /// <returns></returns>
+        IList<T> BatchUpdate(IEnumerable<T> updatedEntities);
+		
+        /// <summary>
 		/// 刪除一筆資料內容。
 		/// </summary>
 		/// <param name="entity">要被刪除的Entity。</param>

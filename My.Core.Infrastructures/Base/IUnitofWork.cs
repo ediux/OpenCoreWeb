@@ -1,33 +1,39 @@
 ﻿using System;
 using System.Data.Entity;
+using System.Data.Entity.Infrastructure;
 namespace My.Core.Infrastructures.DAL
 {
-	/// <summary>
-	/// Unitof work.
-	/// </summary>
-	public interface IUnitofWork : IDisposable
-	{
-		
-		/// <summary>
-		/// Gets the entity.
-		/// </summary>
-		/// <returns>The entity.</returns>
+    /// <summary>
+    /// Unitof work.
+    /// </summary>
+    public interface IUnitofWork : IDisposable
+    {
+
+        DbEntityEntry<TEntity> GetEntry<TEntity>(TEntity entity) where TEntity : class;
+
+        /// <summary>
+        /// Gets the entity.
+        /// </summary>
+        /// <returns>The entity.</returns>
         /// <typeparam name="TEntity">The 1st type parameter.</typeparam>
         IDbSet<TEntity> GetEntity<TEntity>() where TEntity : class;
-		/// <summary>
-		/// Gets the repository.
-		/// </summary>
-		/// <returns>The repository.</returns>
-		/// <typeparam name="TEntity">The 1st type parameter.</typeparam>
-        IRepositoryBase<TEntity> GetRepository<TEntity>() where TEntity : class;
 
-		/// <summary>
-		/// Saves the changes.
-		/// </summary>
-		/// <returns>The changes.</returns>
+        /// <summary>
+        /// Gets the repository.
+        /// </summary>
+        /// <returns>The repository.</returns>
+        /// <typeparam name="TEntity">The 1st type parameter.</typeparam>
+        TRepository GetRepository<TRepository, TEntity>()
+            where TRepository : IRepositoryBase<TEntity>
+            where TEntity : class;
+
+        /// <summary>
+        /// Saves the changes.
+        /// </summary>
+        /// <returns>The changes.</returns>
         int SaveChanges();
-	
-	}
+
+    }
 
     public interface IUnitofWork<TDbContext> : IUnitofWork
         where TDbContext : DbContext

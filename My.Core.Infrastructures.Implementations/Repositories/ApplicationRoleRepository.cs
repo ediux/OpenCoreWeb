@@ -8,94 +8,135 @@ using My.Core.Infrastructures.Implementations.Models;
 
 namespace My.Core.Infrastructures.Implementations
 {
-	public class ApplicationRoleRepository:IApplicationRoleRepository<ApplicationRole>
-	{
-		public ApplicationRoleRepository()
-		{
-		}
+    public class ApplicationRoleRepository : RepositoryBase<ApplicationRole>, IApplicationRoleRepository<ApplicationRole>
+    {
+        private IApplicationUserRepository<ApplicationUser> accountrepo;
 
-		public ILogWriter Logger
-		{
-			get
-			{
-				throw new NotImplementedException();
-			}
+        public ApplicationRoleRepository(IUnitofWork unitofwork)
+            : base(unitofwork)
+        {
+            accountrepo = _unitofwork.GetRepository<IApplicationUserRepository<ApplicationUser>, ApplicationUser>();
+        }
 
-			set
-			{
-				throw new NotImplementedException();
-			}
-		}
+        public override ApplicationRole Update(ApplicationRole entity)
+        {
+            try
+            {
+                entity.LastUpdateTime = DateTime.Now.ToUniversalTime();
+                entity.LastUpdateUserId = GetCurrentLoginedUserId();
+                return base.Update(entity);
+            }
+            catch (Exception ex)
+            {
+                WriteErrorLog(ex);
+                throw ex;
+            }
 
-		public void AddUserToRole(int RoleId, int MemberId)
-		{
-			throw new NotImplementedException();
-		}
+        }
 
-		public IList<ApplicationRole> BatchCreate(IEnumerable<ApplicationRole> entities)
-		{
-			throw new NotImplementedException();
-		}
+        public ApplicationRole FindById(int RoleId)
+        {
+            try
+            {
+                return Find(RoleId);
+            }
+            catch (Exception ex)
+            {
+                WriteErrorLog(ex);
+                throw ex;
+            }
 
-		public ApplicationRole Create(ApplicationRole entity)
-		{
-			throw new NotImplementedException();
-		}
+        }
 
-		public void Delete(ApplicationRole entity)
-		{
-			throw new NotImplementedException();
-		}
+        public ApplicationRole FindByName(string roleName)
+        {
+            try
+            {
+                var role = (from q in FindAll()
+                            where q.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase)
+                               && q.Void == false
+                            select q).SingleOrDefault();
 
-		public ApplicationRole Find(params object[] values)
-		{
-			throw new NotImplementedException();
-		}
+                return role;
 
-		public IQueryable<ApplicationRole> FindAll()
-		{
-			throw new NotImplementedException();
-		}
+            }
+            catch (Exception ex)
+            {
+                WriteErrorLog(ex);
+                throw ex;
+            }
+        }
 
-		public ApplicationRole FindById(int RoleId)
-		{
-			throw new NotImplementedException();
-		}
+        public IList<ApplicationRole> FindByUser(int MemberId)
+        {
+            try
+            {
+                var result = from q in accountrepo.Find(MemberId).ApplicationUserRole
+                             where q.Void==false
+                             select q.ApplicationRole;
 
-		public ApplicationRole FindByName(string roleName)
-		{
-			throw new NotImplementedException();
-		}
+                return ToList(result.AsQueryable());
+            }
+            catch (Exception ex)
+            {
+                WriteErrorLog(ex);
+                throw ex;
+            }
+        }
 
-		public IList<ApplicationRole> FindByUser(int MemberId)
-		{
-			throw new NotImplementedException();
-		}
+        public void AddUserToRole(int RoleId, int MemberId)
+        {
+            try
+            {
+                var user = accountrepo.Find(MemberId);
+                user.ApplicationUserRole.Add(new ApplicationUserRole() { RoleId=RoleId, UserId = MemberId });
+                accountrepo.Update(user);
+                SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                WriteErrorLog(ex);
+                throw ex;
+            }
+        }
 
-		public bool IsInRole(int MemberId, string roleName)
-		{
-			throw new NotImplementedException();
-		}
+        public void RemoveUserFromRole(int RoleId, int MemberId)
+        {
+            try
+            {
+                var user = (from q in accountrepo.Find(MemberId).ApplicationUserRole
+                            where q.UserId == MemberId && q.RoleId == RoleId
+                            select q).Single();
 
-		public void RemoveUserFromRole(int RoleId, int MemberId)
-		{
-			throw new NotImplementedException();
-		}
+                user.Void = true;
+     
+               
+            }
+            catch (Exception ex)
+            {
+                WriteErrorLog(ex);
+                throw ex;
+            }
+        }
 
-		public void SaveChanges()
-		{
-			throw new NotImplementedException();
-		}
+        public bool IsInRole(int MemberId, string roleName)
+        {
+            try
+            {
+                var user = accountrepo.Find(MemberId);
 
-		public IList<ApplicationRole> ToList(IQueryable<ApplicationRole> source)
-		{
-			throw new NotImplementedException();
-		}
+                var chk = from q in user.ApplicationUserRole
+                          where q.ApplicationRole.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase)
+                          select q;
 
-		public ApplicationRole Update(ApplicationRole entity)
-		{
-			throw new NotImplementedException();
-		}
-	}
+                return chk.Any();
+            }
+            catch (Exception ex)
+            {
+                WriteErrorLog(ex);
+                throw ex;
+            }
+        }
+    }
 }
 

@@ -76,7 +76,8 @@ namespace OpenCoreWeb.Models
         {
             return new Task(() =>
             {
-                accountrepo.Delete(user);
+                user.Void = true;
+                accountrepo.Update(user);
                 accountrepo.SaveChanges();
             });
         }
@@ -171,7 +172,7 @@ namespace OpenCoreWeb.Models
                                    where q.ApplicationRole.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase)
                                    select q).Single();
 
-                user.ApplicationUserRole.Remove(userinroles);
+                userinroles.Void = true;
                 accountrepo.Update(user);
                 accountrepo.SaveChanges();
             });
@@ -193,8 +194,8 @@ namespace OpenCoreWeb.Models
             return new Task<string>(() =>
             {
                 var userinroles = (from q in user.ApplicationUserProfileRef
-                                   select q.ApplicationUserProfile.EMail);
-                return string.Join(";", userinroles.ToArray());
+                                   select q.ApplicationUserProfile.EMail).Single();
+                return userinroles;
             });
         }
 
@@ -261,8 +262,8 @@ namespace OpenCoreWeb.Models
             return new Task<int>(() =>
             {
                 user.AccessFailedCount += 1;
-                user.LastActivityTime = user.LastUpdateTime = DateTime.Now;
-                user.LastUpdateUserId = user.Id;
+                user.LastActivityTime =  DateTime.Now;
+              
                 user = accountrepo.Update(user);
                 accountrepo.SaveChanges();
                 return user.AccessFailedCount;
@@ -274,10 +275,11 @@ namespace OpenCoreWeb.Models
             return new Task(() =>
             {
                 user.AccessFailedCount = 0;
-                user.LastActivityTime = user.LastUpdateTime = DateTime.Now;
-                user.LastUpdateUserId = user.Id;
+                user.LastActivityTime =  DateTime.Now;
+              
                 user.LockoutEnabled = false;
                 user.LockoutEndDate = DateTime.Now;
+               
                 accountrepo.Update(user);
                 accountrepo.SaveChanges();
             });
@@ -288,7 +290,7 @@ namespace OpenCoreWeb.Models
             return new Task(() =>
             {
                 user.AccessFailedCount = 0;
-                user.LastActivityTime = user.LastUpdateTime = DateTime.Now;
+                user.LastActivityTime = DateTime.Now;
                 user.LastUpdateUserId = user.Id;
                 user.LockoutEnabled = enabled;
 
@@ -302,8 +304,8 @@ namespace OpenCoreWeb.Models
             return new Task(() =>
             {
                 user.AccessFailedCount = 0;
-                user.LastActivityTime = user.LastUpdateTime = DateTime.Now;
-                user.LastUpdateUserId = user.Id;
+                user.LastActivityTime =  DateTime.Now;
+             
                 user.LockoutEndDate = new DateTime(lockoutEnd.Ticks);
                 accountrepo.Update(user);
                 accountrepo.SaveChanges();
@@ -359,9 +361,9 @@ namespace OpenCoreWeb.Models
             return new Task(() =>
             {
                 var foundlogininfo = (from q in user.ApplicationUserLogin
-                                     where q.LoginProvider == login.LoginProvider
-                                     && q.ProviderKey == login.ProviderKey
-                                     select q).Single();
+                                      where q.LoginProvider == login.LoginProvider
+                                      && q.ProviderKey == login.ProviderKey
+                                      select q).Single();
 
                 user.ApplicationUserLogin.Remove(foundlogininfo);
                 accountrepo.Update(user);
@@ -373,75 +375,145 @@ namespace OpenCoreWeb.Models
         #region Password Store
         public Task<string> GetPasswordHashAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<string>(() =>
+            {
+                return user.PasswordHash;
+            });
         }
 
         public Task<bool> HasPasswordAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<bool>(() =>
+            {
+                if (!string.IsNullOrEmpty(user.Password))
+                    return true;
+                if (!string.IsNullOrEmpty(user.PasswordHash))
+                    return true;
+                return false;
+            });
         }
 
         public Task SetPasswordHashAsync(ApplicationUser user, string passwordHash)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                user.PasswordHash = passwordHash;
+                user.LastActivityTime = user.LastUpdateTime = DateTime.Now.ToUniversalTime();
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
         #endregion
 
         #region Phone Number Store
         public Task<string> GetPhoneNumberAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<string>(() =>
+            {
+                var result = from q in user.ApplicationUserProfileRef
+                             select q.ApplicationUserProfile.PhoneNumber;
+
+                return string.Join(";", result.ToArray());
+            });
         }
 
         public Task<bool> GetPhoneNumberConfirmedAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<bool>(() =>
+            {
+                var result = (from q in user.ApplicationUserProfileRef
+                              select q.ApplicationUserProfile.PhoneConfirmed).Single();
+                return result;
+            });
         }
 
         public Task SetPhoneNumberAsync(ApplicationUser user, string phoneNumber)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                var profile = (from q in user.ApplicationUserProfileRef
+                               select q.ApplicationUserProfile).Single();
+
+                profile.PhoneNumber = phoneNumber;
+                profile.PhoneConfirmed = true;
+
+                if (GetTwoFactorEnabledAsync(user).Result)
+                    profile.PhoneConfirmed = false;
+
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
 
         public Task SetPhoneNumberConfirmedAsync(ApplicationUser user, bool confirmed)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                var profile = (from q in user.ApplicationUserProfileRef
+                               select q.ApplicationUserProfile).Single();
+
+                profile.PhoneConfirmed = confirmed;
+
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
         #endregion
 
         #region Security Stamp Store
         public Task<string> GetSecurityStampAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<string>(() => {
+                return user.SecurityStamp;
+            });
         }
 
         public Task SetSecurityStampAsync(ApplicationUser user, string stamp)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                user.SecurityStamp = stamp;
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
         #endregion
 
         #region TwoFactor
         public Task<bool> GetTwoFactorEnabledAsync(ApplicationUser user)
         {
-            throw new System.NotImplementedException();
+            return new Task<bool>(() => {
+                return user.TwoFactorEnabled;
+            });
         }
 
         public Task SetTwoFactorEnabledAsync(ApplicationUser user, bool enabled)
         {
-            throw new System.NotImplementedException();
+            return new Task(() => {
+                user.TwoFactorEnabled = enabled;
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
         }
         #endregion
 
         #region Role Store
         public Task CreateAsync(ApplicationRole role)
         {
-            throw new System.NotImplementedException();
+            return new Task(() => {
+                rolerepo.Create(role);
+                rolerepo.SaveChanges();
+            });
         }
 
         public Task DeleteAsync(ApplicationRole role)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {
+                role.Void = true;
+                rolerepo.Update(role);
+                rolerepo.SaveChanges();
+            });
         }
 
         Task<ApplicationRole> IRoleStore<ApplicationRole, int>.FindByIdAsync(int roleId)

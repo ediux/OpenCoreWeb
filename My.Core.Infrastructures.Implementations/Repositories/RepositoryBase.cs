@@ -9,7 +9,7 @@ using My.Core.Infrastructures.Implementations.Models;
 using System.Data.Entity;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
-
+using Microsoft.AspNet.Identity;
 namespace My.Core.Infrastructures.Implementations
 {
     public abstract class RepositoryBase<TEntity> : IRepositoryBase<TEntity> where TEntity : class
@@ -64,7 +64,15 @@ namespace My.Core.Infrastructures.Implementations
         }
         #endregion
 
+        protected virtual int GetCurrentLoginedUserId()
+        {
+            if (System.Web.HttpContext.Current != null)
+            {
+                return System.Web.HttpContext.Current.User.Identity.GetUserId<int>();
+            }
 
+            return -1;
+        }
         public virtual TEntity Create(TEntity entity)
         {
             try

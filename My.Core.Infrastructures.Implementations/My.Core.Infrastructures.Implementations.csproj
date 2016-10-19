@@ -191,6 +191,7 @@
     <Compile Include="Enums\OperationCodeEnum.cs" />
     <Compile Include="Repositories\ApplicationRoleRepository.cs" />
     <Compile Include="Repositories\RepositoryBase.cs" />
+    <Compile Include="Repositories\UserOperationCodeDefineRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\My.Core.Infrastructures\My.Core.Infrastructures.csproj">

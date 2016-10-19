@@ -1,12 +1,11 @@
 namespace My.Core.Infrastructures.Implementations.Models
 {
-    using Microsoft.AspNet.Identity;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     
     [MetadataType(typeof(ApplicationRoleMetaData))]
-    public partial class ApplicationRole : IRole<int>
+    public partial class ApplicationRole
     {
     }
     
@@ -26,6 +25,8 @@ namespace My.Core.Infrastructures.Implementations.Models
         public int LastUpdateUserId { get; set; }
         [Required]
         public System.DateTime LastUpdateTime { get; set; }
+        [Required]
+        public bool Void { get; set; }
     
         public virtual ICollection<ApplicationUserRole> ApplicationUserRole { get; set; }
     }

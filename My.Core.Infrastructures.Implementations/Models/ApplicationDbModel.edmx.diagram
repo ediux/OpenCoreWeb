@@ -7,7 +7,7 @@
       <Diagram DiagramId="18d61634871d439086afb776c31732b8" Name="Diagram1">
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationGroup" Width="1.5" PointX="0.75" PointY="3.25" IsExpanded="true" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationGroupTree" Width="1.5" PointX="3" PointY="3.5" IsExpanded="true" />
-        <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationRole" Width="1.5" PointX="0.75" PointY="15.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationRole" Width="1.5" PointX="0.75" PointY="16.125" IsExpanded="true" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUser" Width="1.5" PointX="0.75" PointY="7" IsExpanded="true" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserGroup" Width="1.5" PointX="3" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="OpenWebSiteModel.ApplicationUserProfile" Width="1.5" PointX="0.625" PointY="13" IsExpanded="true" />

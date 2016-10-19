@@ -13,9 +13,9 @@
           <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Void" Type="bit" Nullable="false" />
           <Property Name="CreateUserId" Type="int" Nullable="false" />
-          <Property Name="CreateTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
           <Property Name="LastUpdateUserId" Type="int" Nullable="false" />
-          <Property Name="LastUpdateTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="LastUpdateTime" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="ApplicationGroupTree">
           <Key>
@@ -36,10 +36,11 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Void" Type="bit" Nullable="false" />
           <Property Name="CreateUserId" Type="int" Nullable="false" />
-          <Property Name="CreateTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
           <Property Name="LastUpdateUserId" Type="int" Nullable="false" />
-          <Property Name="LastUpdateTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="LastUpdateTime" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="ApplicationUser">
           <Key>
@@ -53,15 +54,15 @@
           <Property Name="TwoFactorEnabled" Type="bit" Nullable="false" />
           <Property Name="Void" Type="bit" Nullable="false" />
           <Property Name="CreateUserId" Type="int" Nullable="false" />
-          <Property Name="CreateTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
           <Property Name="LastUpdateUserId" Type="int" Nullable="false" />
-          <Property Name="LastUpdateTime" Type="smalldatetime" Nullable="false" />
-          <Property Name="LastActivityTime" Type="smalldatetime" />
-          <Property Name="LastUnlockedTime" Type="smalldatetime" />
-          <Property Name="LastLoginFailTime" Type="smalldatetime" />
+          <Property Name="LastUpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="LastActivityTime" Type="datetime" />
+          <Property Name="LastUnlockedTime" Type="datetime" />
+          <Property Name="LastLoginFailTime" Type="datetime" />
           <Property Name="AccessFailedCount" Type="int" Nullable="false" />
           <Property Name="LockoutEnabled" Type="bit" />
-          <Property Name="LockoutEndDate" Type="smalldatetime" />
+          <Property Name="LockoutEndDate" Type="datetime" />
           <Property Name="ResetPasswordToken" Type="nvarchar" MaxLength="512" />
         </EntityType>
         <EntityType Name="ApplicationUserClaim">
@@ -96,14 +97,14 @@
             <PropertyRef Name="Id" />
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
-          <Property Name="DisplayName" Type="nvarchar" MaxLength="50" Nullable="false" />
           <Property Name="Address" Type="nvarchar(max)" />
           <Property Name="EMail" Type="nvarchar" MaxLength="512" Nullable="false" />
           <Property Name="EMailConfirmed" Type="bit" Nullable="false" />
           <Property Name="PhoneNumber" Type="nvarchar" MaxLength="10" Nullable="false" />
           <Property Name="PhoneConfirmed" Type="bit" Nullable="false" />
-          <Property Name="CreateTime" Type="smalldatetime" Nullable="false" />
-          <Property Name="LastUpdateTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+          <Property Name="LastUpdateTime" Type="datetime" Nullable="false" />
+          <Property Name="DisplayName" Type="nvarchar" MaxLength="50" Nullable="false" />
         </EntityType>
         <EntityType Name="ApplicationUserProfileRef">
           <Key>
@@ -113,8 +114,8 @@
           <Property Name="UserId" Type="int" Nullable="false" />
           <Property Name="ProfileId" Type="int" Nullable="false" />
           <Property Name="Void" Type="bit" Nullable="false" />
-          <Property Name="CreateTime" Type="smalldatetime" Nullable="false" />
-          <Property Name="LastUpdateTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="CreateTime" Type="datetime" Nullable="false" />
+          <Property Name="LastUpdateTime" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityType Name="ApplicationUserRole">
           <Key>
@@ -139,7 +140,7 @@
           </Key>
           <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="Body" Type="nvarchar(max)" />
-          <Property Name="LogTime" Type="smalldatetime" Nullable="false" />
+          <Property Name="LogTime" Type="datetime" Nullable="false" />
           <Property Name="OpreationCode" Type="int" Nullable="false" />
           <Property Name="URL" Type="nvarchar(max)" />
           <Property Name="UserId" Type="int" Nullable="false" />
@@ -378,9 +379,9 @@
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="Void" Type="Boolean" Nullable="false" />
           <Property Name="CreateUserId" Type="Int32" Nullable="false" />
-          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="LastUpdateUserId" Type="Int32" Nullable="false" />
-          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="ApplicationGroupTree" Relationship="Self.FK_ApplicationGroupTree_ToApplicationGroup_Child" FromRole="ApplicationGroup" ToRole="ApplicationGroupTree" />
           <NavigationProperty Name="ApplicationGroupTree1" Relationship="Self.FK_ApplicationGroupTree_ToApplicationGroup_Current" FromRole="ApplicationGroup" ToRole="ApplicationGroupTree" />
           <NavigationProperty Name="ApplicationGroupTree2" Relationship="Self.FK_ApplicationGroupTree_ToApplicationGroup_Parent" FromRole="ApplicationGroup" ToRole="ApplicationGroupTree" />
@@ -409,10 +410,11 @@
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Name" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="CreateUserId" Type="Int32" Nullable="false" />
-          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="LastUpdateUserId" Type="Int32" Nullable="false" />
-          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="ApplicationUserRole" Relationship="Self.FK_ApplicationUserRole_ToApplicationRole" FromRole="ApplicationRole" ToRole="ApplicationUserRole" />
+          <Property Name="Void" Type="Boolean" Nullable="false" />
         </EntityType>
         <EntityType Name="ApplicationUser">
           <Key>
@@ -426,18 +428,18 @@
           <Property Name="TwoFactorEnabled" Type="Boolean" Nullable="false" />
           <Property Name="Void" Type="Boolean" Nullable="false" />
           <Property Name="CreateUserId" Type="Int32" Nullable="false" />
-          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="LastUpdateUserId" Type="Int32" Nullable="false" />
-          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="ApplicationUserGroup" Relationship="Self.FK_ApplicationUserGroup_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserGroup" />
           <NavigationProperty Name="ApplicationUserProfileRef" Relationship="Self.FK_ApplicationUserProfileRef_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserProfileRef" />
           <NavigationProperty Name="ApplicationUserRole" Relationship="Self.FK_ApplicationUserRole_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserRole" />
-          <Property Name="LastActivityTime" Type="DateTime" Precision="0" />
-          <Property Name="LastUnlockedTime" Type="DateTime" Precision="0" />
-          <Property Name="LastLoginFailTime" Type="DateTime" Precision="0" />
+          <Property Name="LastActivityTime" Type="DateTime" Precision="3" />
+          <Property Name="LastUnlockedTime" Type="DateTime" Precision="3" />
+          <Property Name="LastLoginFailTime" Type="DateTime" Precision="3" />
           <Property Name="AccessFailedCount" Type="Int32" Nullable="false" />
           <Property Name="LockoutEnabled" Type="Boolean" />
-          <Property Name="LockoutEndDate" Type="DateTime" Precision="0" />
+          <Property Name="LockoutEndDate" Type="DateTime" Precision="3" />
           <Property Name="ResetPasswordToken" Type="String" MaxLength="512" FixedLength="false" Unicode="true" />
           <NavigationProperty Name="UserOperationLog" Relationship="OpenWebSiteModel.FK_UserOperationLog_ToApplicationUser" FromRole="ApplicationUser" ToRole="UserOperationLog" />
           <NavigationProperty Name="ApplicationUserClaim" Relationship="OpenWebSiteModel.FK_ApplicationUserClaim_ToApplicationUser" FromRole="ApplicationUser" ToRole="ApplicationUserClaim" />
@@ -464,8 +466,8 @@
           <Property Name="EMailConfirmed" Type="Boolean" Nullable="false" />
           <Property Name="PhoneNumber" Type="String" MaxLength="10" FixedLength="false" Unicode="true" Nullable="false" />
           <Property Name="PhoneConfirmed" Type="Boolean" Nullable="false" />
-          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="ApplicationUserProfileRef" Relationship="Self.FK_ApplicationUserProfileRef_ToApplicationUserProfile" FromRole="ApplicationUserProfile" ToRole="ApplicationUserProfileRef" />
           <Property Name="DisplayName" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
         </EntityType>
@@ -477,8 +479,8 @@
           <Property Name="UserId" Type="Int32" Nullable="false" />
           <Property Name="ProfileId" Type="Int32" Nullable="false" />
           <Property Name="Void" Type="Boolean" Nullable="false" />
-          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="0" />
-          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CreateTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="LastUpdateTime" Type="DateTime" Nullable="false" Precision="3" />
           <NavigationProperty Name="ApplicationUser" Relationship="Self.FK_ApplicationUserProfileRef_ToApplicationUser" FromRole="ApplicationUserProfileRef" ToRole="ApplicationUser" />
           <NavigationProperty Name="ApplicationUserProfile" Relationship="Self.FK_ApplicationUserProfileRef_ToApplicationUserProfile" FromRole="ApplicationUserProfileRef" ToRole="ApplicationUserProfile" />
         </EntityType>
@@ -682,7 +684,7 @@
           </Key>
           <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="Body" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
-          <Property Name="LogTime" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="LogTime" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="OpreationCode" Type="Int32" Nullable="false" />
           <Property Name="URL" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" />
           <Property Name="UserId" Type="Int32" Nullable="false" />
@@ -790,6 +792,7 @@
           <EntitySetMapping Name="ApplicationRole">
             <EntityTypeMapping TypeName="OpenWebSiteModel.ApplicationRole">
               <MappingFragment StoreEntitySet="ApplicationRole">
+                <ScalarProperty Name="Void" ColumnName="Void" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
                 <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="CreateUserId" ColumnName="CreateUserId" />

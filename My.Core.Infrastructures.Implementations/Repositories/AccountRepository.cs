@@ -15,10 +15,12 @@ namespace My.Core.Infrastructures.Implementations
     public class ApplicationUserRepository : RepositoryBase<ApplicationUser>, IApplicationUserRepository<ApplicationUser>
     {
 
+        private IUserOperationCodeDefineRepository<UserOperationCodeDefine> logdefinerepo;
 
         public ApplicationUserRepository(IUnitofWork unitofwork)
             : base(unitofwork)
         {
+            logdefinerepo = _unitofwork.GetRepository<UserOperationCodeDefineRepository, UserOperationCodeDefine>() as IUserOperationCodeDefineRepository<UserOperationCodeDefine>;
         }
 
         #region Helper Functions
@@ -48,7 +50,7 @@ namespace My.Core.Infrastructures.Implementations
                     return;
                 }
 
-                IUserOperationCodeDefineRepository<UserOperationCodeDefine> logdefinerepo = _unitofwork.GetRepository<UserOperationCodeDefine>() as IUserOperationCodeDefineRepository<UserOperationCodeDefine>;
+               
 
                 var founddefined = logdefinerepo.Find((int)code);
 
@@ -73,15 +75,7 @@ namespace My.Core.Infrastructures.Implementations
 
         }
 
-        protected virtual int GetCurrentLoginedUserId()
-        {
-            if (System.Web.HttpContext.Current != null)
-            {
-                return System.Web.HttpContext.Current.User.Identity.GetUserId<int>();
-            }
-
-            return -1;
-        }
+       
 
         protected virtual bool GetIsOnline(int memberid)
         {
@@ -404,13 +398,15 @@ namespace My.Core.Infrastructures.Implementations
 
 
 
-        public ApplicationUser Update(ApplicationUser entity)
+        public override ApplicationUser Update(ApplicationUser entity)
         {
             var currentLoginedUser = Find(GetCurrentLoginedUserId());
 
             try
             {
                 WriteUserOperationLog(OperationCodeEnum.Account_Update_Start, currentLoginedUser);
+                entity.LastUpdateTime = DateTime.Now.ToUniversalTime();
+                entity.LastUpdateUserId = currentLoginedUser.Id;
                 base.Update(entity);
                 WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, currentLoginedUser);
                 return entity;

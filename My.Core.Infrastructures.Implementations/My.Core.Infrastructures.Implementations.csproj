@@ -187,7 +187,7 @@
     <Compile Include="Models\ApplicationUserProfile.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Repositories\AccountRepository.cs" />
+    <Compile Include="Repositories\ApplicationUserRepository.cs" />
     <Compile Include="Enums\OperationCodeEnum.cs" />
     <Compile Include="Repositories\ApplicationRoleRepository.cs" />
     <Compile Include="Repositories\RepositoryBase.cs" />

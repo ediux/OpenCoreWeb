@@ -53,7 +53,7 @@
     <Compile Include="Base\IServiceBase.cs" />
     <Compile Include="Repositories\IApplicationUserRepository.cs" />
     <Compile Include="Repositories\IApplicationRoleRepository.cs" />
-    <Compile Include="Repositories\IGroupRepository.cs" />
+    <Compile Include="Repositories\IApplicationGroupRepository.cs" />
     <Compile Include="Repositories\IUserProfileRepository.cs" />
     <Compile Include="Repositories\IUserOperationCodeDefineRepository.cs" />
     <Compile Include="Repositories\IUserOperationLogRepository.cs" />

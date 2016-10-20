@@ -2,7 +2,6 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using System.Linq;
 using My.Core.Infrastructures.Implementations.Models;
 using System;
@@ -44,7 +43,7 @@ namespace OpenCoreWeb.Models
         , IUserEmailStore<ApplicationUser, int>, IUserLockoutStore<ApplicationUser, int>
         , IUserLoginStore<ApplicationUser, int>, IUserPasswordStore<ApplicationUser, int>
         , IUserPhoneNumberStore<ApplicationUser, int>, IUserSecurityStampStore<ApplicationUser, int>
-        , IUserTwoFactorStore<ApplicationUser, int>
+        , IUserTwoFactorStore<ApplicationUser, int>, IUserClaimStore<ApplicationUser, int>
         , IQueryableUserStore<ApplicationUser, int>, IQueryableRoleStore<ApplicationRole, int>
     {
 
@@ -52,7 +51,7 @@ namespace OpenCoreWeb.Models
         SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
         IUnitofWork uow;
         IApplicationUserRepository<ApplicationUser> accountrepo;
-        IApplicationRoleRepository<ApplicationRole,ApplicationUserRole> rolerepo;
+        IApplicationRoleRepository<ApplicationRole, ApplicationUserRole> rolerepo;
 
 
         public OpenCoreWebUserStore(DbContext context)
@@ -65,16 +64,17 @@ namespace OpenCoreWeb.Models
         #region 使用者
         public Task CreateAsync(ApplicationUser user)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 accountrepo.Create(user);
                 accountrepo.SaveChanges();
             });
+
         }
 
         public Task DeleteAsync(ApplicationUser user)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 user.Void = true;
                 accountrepo.Update(user);
@@ -84,7 +84,7 @@ namespace OpenCoreWeb.Models
 
         public Task<ApplicationUser> FindByIdAsync(int userId)
         {
-            return new Task<ApplicationUser>(() =>
+            return Task<ApplicationUser>.Run(() =>
             {
                 return accountrepo.FindUserById(userId, false);
             });
@@ -92,7 +92,7 @@ namespace OpenCoreWeb.Models
 
         public Task<ApplicationUser> FindByNameAsync(string userName)
         {
-            return new Task<ApplicationUser>(() =>
+            return Task<ApplicationUser>.Run(() =>
             {
                 return accountrepo.FindUserByLoginAccount(userName, false);
             });
@@ -100,7 +100,7 @@ namespace OpenCoreWeb.Models
 
         public Task UpdateAsync(ApplicationUser user)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 accountrepo.Update(user);
                 accountrepo.SaveChanges();
@@ -135,7 +135,7 @@ namespace OpenCoreWeb.Models
         #region User Role Store
         public Task AddToRoleAsync(ApplicationUser user, string roleName)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 int roleid = rolerepo.FindByName(roleName).Id;
                 rolerepo.AddUserToRole(roleid, user.Id);
@@ -145,17 +145,18 @@ namespace OpenCoreWeb.Models
 
         public Task<System.Collections.Generic.IList<string>> GetRolesAsync(ApplicationUser user)
         {
-            return new Task<System.Collections.Generic.IList<string>>(() =>
+            return Task<System.Collections.Generic.IList<string>>.Run(() =>
             {
                 var roles = from q in user.ApplicationUserRole
                             select q.ApplicationRole.Name;
-                return roles.ToList();
+
+                return (System.Collections.Generic.IList<string>)roles.ToList();
             });
         }
 
         public Task<bool> IsInRoleAsync(ApplicationUser user, string roleName)
         {
-            return new Task<bool>(() =>
+            return Task<bool>.Run(() =>
             {
                 var userinroles = from q in user.ApplicationUserRole
                                   where q.ApplicationRole.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase)
@@ -166,7 +167,7 @@ namespace OpenCoreWeb.Models
 
         public Task RemoveFromRoleAsync(ApplicationUser user, string roleName)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 var userinroles = (from q in user.ApplicationUserRole
                                    where q.ApplicationRole.Name.Equals(roleName, StringComparison.InvariantCultureIgnoreCase)
@@ -182,7 +183,7 @@ namespace OpenCoreWeb.Models
         #region EMail Stroe
         public Task<ApplicationUser> FindByEmailAsync(string email)
         {
-            return new Task<ApplicationUser>(() =>
+            return Task<ApplicationUser>.Run(() =>
             {
                 var findemail = accountrepo.FindByEmail(email);
                 return findemail;
@@ -191,17 +192,25 @@ namespace OpenCoreWeb.Models
 
         public Task<string> GetEmailAsync(ApplicationUser user)
         {
-            return new Task<string>(() =>
+            return Task<string>.Run(() =>
             {
-                var userinroles = (from q in user.ApplicationUserProfileRef
-                                   select q.ApplicationUserProfile.EMail).Single();
-                return userinroles;
+                try
+                {
+                    var userinroles = (from q in user.ApplicationUserProfileRef
+                                       select q.ApplicationUserProfile.EMail).SingleOrDefault();
+                    return userinroles;
+                }
+                catch (Exception ex)
+                {
+                    return string.Empty;
+                }
+             
             });
         }
 
         public Task<bool> GetEmailConfirmedAsync(ApplicationUser user)
         {
-            return new Task<bool>(() =>
+            return Task<bool>.Run(() =>
             {
                 var userinroles = (from q in user.ApplicationUserProfileRef
                                    select q.ApplicationUserProfile.EMailConfirmed);
@@ -211,7 +220,7 @@ namespace OpenCoreWeb.Models
 
         public Task SetEmailAsync(ApplicationUser user, string email)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 var useremail = user.ApplicationUserProfileRef.Single();
                 useremail.ApplicationUserProfile.EMail = email;
@@ -222,7 +231,7 @@ namespace OpenCoreWeb.Models
 
         public Task SetEmailConfirmedAsync(ApplicationUser user, bool confirmed)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 var useremail = user.ApplicationUserProfileRef.Single();
                 useremail.ApplicationUserProfile.EMailConfirmed = confirmed;
@@ -235,7 +244,7 @@ namespace OpenCoreWeb.Models
         #region Lockout Store
         public Task<int> GetAccessFailedCountAsync(ApplicationUser user)
         {
-            return new Task<int>(() =>
+            return Task<int>.Run(() =>
             {
                 return user.AccessFailedCount;
             });
@@ -243,7 +252,7 @@ namespace OpenCoreWeb.Models
 
         public Task<bool> GetLockoutEnabledAsync(ApplicationUser user)
         {
-            return new Task<bool>(() =>
+            return Task<bool>.Run(() =>
             {
                 return user.LockoutEnabled.HasValue ? user.LockoutEnabled.Value : false;
             });
@@ -251,7 +260,7 @@ namespace OpenCoreWeb.Models
 
         public Task<System.DateTimeOffset> GetLockoutEndDateAsync(ApplicationUser user)
         {
-            return new Task<System.DateTimeOffset>(() =>
+            return Task<System.DateTimeOffset>.Run(() =>
             {
                 return user.LockoutEndDate.HasValue ? user.LockoutEndDate.Value : new System.DateTimeOffset(new DateTime(1754, 1, 1).ToUniversalTime());
             });
@@ -259,11 +268,11 @@ namespace OpenCoreWeb.Models
 
         public Task<int> IncrementAccessFailedCountAsync(ApplicationUser user)
         {
-            return new Task<int>(() =>
+            return Task<int>.Run(() =>
             {
                 user.AccessFailedCount += 1;
-                user.LastActivityTime =  DateTime.Now;
-              
+                user.LastActivityTime = DateTime.Now;
+
                 user = accountrepo.Update(user);
                 accountrepo.SaveChanges();
                 return user.AccessFailedCount;
@@ -272,14 +281,14 @@ namespace OpenCoreWeb.Models
 
         public Task ResetAccessFailedCountAsync(ApplicationUser user)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 user.AccessFailedCount = 0;
-                user.LastActivityTime =  DateTime.Now;
-              
+                user.LastActivityTime = DateTime.Now;
+
                 user.LockoutEnabled = false;
                 user.LockoutEndDate = DateTime.Now;
-               
+
                 accountrepo.Update(user);
                 accountrepo.SaveChanges();
             });
@@ -287,7 +296,7 @@ namespace OpenCoreWeb.Models
 
         public Task SetLockoutEnabledAsync(ApplicationUser user, bool enabled)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 user.AccessFailedCount = 0;
                 user.LastActivityTime = DateTime.Now;
@@ -301,11 +310,11 @@ namespace OpenCoreWeb.Models
 
         public Task SetLockoutEndDateAsync(ApplicationUser user, System.DateTimeOffset lockoutEnd)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 user.AccessFailedCount = 0;
-                user.LastActivityTime =  DateTime.Now;
-             
+                user.LastActivityTime = DateTime.Now;
+
                 user.LockoutEndDate = new DateTime(lockoutEnd.Ticks);
                 accountrepo.Update(user);
                 accountrepo.SaveChanges();
@@ -316,7 +325,7 @@ namespace OpenCoreWeb.Models
         #region Login Store
         public Task AddLoginAsync(ApplicationUser user, UserLoginInfo login)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 user.ApplicationUserLogin.Add(new ApplicationUserLogin()
                 {
@@ -332,7 +341,7 @@ namespace OpenCoreWeb.Models
 
         public Task<ApplicationUser> FindAsync(UserLoginInfo login)
         {
-            return new Task<ApplicationUser>(() =>
+            return Task<ApplicationUser>.Run(() =>
             {
                 var founduser = from q in accountrepo.FindAll()
                                 from l in q.ApplicationUserLogin
@@ -346,19 +355,20 @@ namespace OpenCoreWeb.Models
 
         public Task<System.Collections.Generic.IList<UserLoginInfo>> GetLoginsAsync(ApplicationUser user)
         {
-            return new Task<System.Collections.Generic.IList<UserLoginInfo>>(() =>
+            return Task<System.Collections.Generic.IList<UserLoginInfo>>.Run(() =>
             {
                 var founduser = from q in accountrepo.FindAll()
                                 from l in q.ApplicationUserLogin
-                                select new UserLoginInfo(l.LoginProvider, l.ProviderKey);
+                                select l;
 
-                return founduser.ToList();
+                return (System.Collections.Generic.IList<UserLoginInfo>)(founduser.ToList()
+                    .ConvertAll(c => new UserLoginInfo(c.LoginProvider, c.ProviderKey)));
             });
         }
 
         public Task RemoveLoginAsync(ApplicationUser user, UserLoginInfo login)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 var foundlogininfo = (from q in user.ApplicationUserLogin
                                       where q.LoginProvider == login.LoginProvider
@@ -375,7 +385,7 @@ namespace OpenCoreWeb.Models
         #region Password Store
         public Task<string> GetPasswordHashAsync(ApplicationUser user)
         {
-            return new Task<string>(() =>
+            return Task<string>.Run(() =>
             {
                 return user.PasswordHash;
             });
@@ -383,7 +393,7 @@ namespace OpenCoreWeb.Models
 
         public Task<bool> HasPasswordAsync(ApplicationUser user)
         {
-            return new Task<bool>(() =>
+            return Task<bool>.Run(() =>
             {
                 if (!string.IsNullOrEmpty(user.Password))
                     return true;
@@ -395,7 +405,7 @@ namespace OpenCoreWeb.Models
 
         public Task SetPasswordHashAsync(ApplicationUser user, string passwordHash)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 user.PasswordHash = passwordHash;
                 user.LastActivityTime = user.LastUpdateTime = DateTime.Now.ToUniversalTime();
@@ -408,18 +418,18 @@ namespace OpenCoreWeb.Models
         #region Phone Number Store
         public Task<string> GetPhoneNumberAsync(ApplicationUser user)
         {
-            return new Task<string>(() =>
+            return Task<string>.Run(() =>
             {
-                var result = from q in user.ApplicationUserProfileRef
-                             select q.ApplicationUserProfile.PhoneNumber;
+                var result = (from q in user.ApplicationUserProfileRef
+                             select q.ApplicationUserProfile.PhoneNumber).SingleOrDefault();
 
-                return string.Join(";", result.ToArray());
+                return result;
             });
         }
 
         public Task<bool> GetPhoneNumberConfirmedAsync(ApplicationUser user)
         {
-            return new Task<bool>(() =>
+            return Task<bool>.Run(() =>
             {
                 var result = (from q in user.ApplicationUserProfileRef
                               select q.ApplicationUserProfile.PhoneConfirmed).Single();
@@ -429,7 +439,7 @@ namespace OpenCoreWeb.Models
 
         public Task SetPhoneNumberAsync(ApplicationUser user, string phoneNumber)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 var profile = (from q in user.ApplicationUserProfileRef
                                select q.ApplicationUserProfile).Single();
@@ -447,7 +457,7 @@ namespace OpenCoreWeb.Models
 
         public Task SetPhoneNumberConfirmedAsync(ApplicationUser user, bool confirmed)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 var profile = (from q in user.ApplicationUserProfileRef
                                select q.ApplicationUserProfile).Single();
@@ -463,14 +473,15 @@ namespace OpenCoreWeb.Models
         #region Security Stamp Store
         public Task<string> GetSecurityStampAsync(ApplicationUser user)
         {
-            return new Task<string>(() => {
+            return Task<string>.Run(() =>
+            {
                 return user.SecurityStamp;
             });
         }
 
         public Task SetSecurityStampAsync(ApplicationUser user, string stamp)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 user.SecurityStamp = stamp;
                 accountrepo.Update(user);
@@ -482,14 +493,16 @@ namespace OpenCoreWeb.Models
         #region TwoFactor
         public Task<bool> GetTwoFactorEnabledAsync(ApplicationUser user)
         {
-            return new Task<bool>(() => {
+            return Task<bool>.Run(() =>
+            {
                 return user.TwoFactorEnabled;
             });
         }
 
         public Task SetTwoFactorEnabledAsync(ApplicationUser user, bool enabled)
         {
-            return new Task(() => {
+            return Task.Run(() =>
+            {
                 user.TwoFactorEnabled = enabled;
                 accountrepo.Update(user);
                 accountrepo.SaveChanges();
@@ -500,7 +513,8 @@ namespace OpenCoreWeb.Models
         #region Role Store
         public Task CreateAsync(ApplicationRole role)
         {
-            return new Task(() => {
+            return Task.Run(() =>
+            {
                 rolerepo.Create(role);
                 rolerepo.SaveChanges();
             });
@@ -508,7 +522,7 @@ namespace OpenCoreWeb.Models
 
         public Task DeleteAsync(ApplicationRole role)
         {
-            return new Task(() =>
+            return Task.Run(() =>
             {
                 role.Void = true;
                 UpdateAsync(role);
@@ -517,22 +531,24 @@ namespace OpenCoreWeb.Models
 
         Task<ApplicationRole> IRoleStore<ApplicationRole, int>.FindByIdAsync(int roleId)
         {
-            return new Task<ApplicationRole>(() => {
-               return rolerepo.FindById(roleId);
+            return Task<ApplicationRole>.Run(() =>
+            {
+                return rolerepo.FindById(roleId);
             });
         }
 
         Task<ApplicationRole> IRoleStore<ApplicationRole, int>.FindByNameAsync(string roleName)
         {
-            return new Task<ApplicationRole>(() => {
+            return Task<ApplicationRole>.Run(() =>
+            {
                 return rolerepo.FindByName(roleName);
             });
         }
 
         public Task UpdateAsync(ApplicationRole role)
         {
-            return new Task(() =>
-            {      
+            return Task.Run(() =>
+            {
                 rolerepo.Update(role);
                 rolerepo.SaveChanges();
             });
@@ -553,6 +569,36 @@ namespace OpenCoreWeb.Models
         }
         #endregion
 
+        public Task AddClaimAsync(ApplicationUser user, Claim claim)
+        {
+            return Task.Run(() =>
+            {
+                user.ApplicationUserClaim.Add(new ApplicationUserClaim()
+                {
+                    ClaimType = claim.ValueType,
+                    ClaimValue = claim.Value,
+                    UserId = user.Id
+                });
 
+                accountrepo.Update(user);
+                accountrepo.SaveChanges();
+            });
+        }
+
+        public Task<System.Collections.Generic.IList<Claim>> GetClaimsAsync(ApplicationUser user)
+        {
+            return Task<System.Collections.Generic.IList<Claim>>.Run(() =>
+            {
+                return user.ApplicationUserClaim.ToList().ConvertAll<Claim>(c => new Claim(c.ClaimType, c.ClaimValue)) as System.Collections.Generic.IList<Claim>;
+            });
+        }
+
+        public Task RemoveClaimAsync(ApplicationUser user, Claim claim)
+        {
+            return Task.Run(() =>
+            {
+
+            });
+        }
     }
 }

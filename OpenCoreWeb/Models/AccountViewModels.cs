@@ -49,9 +49,8 @@ namespace OpenCoreWeb.Models
     public class LoginViewModel
     {
         [Required]
-        [Display(Name = "電子郵件")]
-        [EmailAddress]
-        public string Email { get; set; }
+        [Display(Name = "帳號名稱")]
+        public string UserName { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
@@ -65,7 +64,9 @@ namespace OpenCoreWeb.Models
     public class RegisterViewModel
     {
         [Required]
-        [EmailAddress]
+        [Display(Name="帳號名稱")]
+        public string UserName { get; set; }
+
         [Display(Name = "電子郵件")]
         public string Email { get; set; }
 
@@ -84,6 +85,9 @@ namespace OpenCoreWeb.Models
     public class ResetPasswordViewModel
     {
         [Required]
+        [Display(Name = "帳號名稱")]
+        public string UserName { get; set; }
+
         [EmailAddress]
         [Display(Name = "電子郵件")]
         public string Email { get; set; }

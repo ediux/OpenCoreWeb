@@ -6,7 +6,6 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
@@ -33,32 +32,32 @@ namespace OpenCoreWeb
     }
 
     // 設定此應用程式中使用的應用程式使用者管理員。UserManager 在 ASP.NET Identity 中定義且由應用程式中使用。
-    public class ApplicationUserManager : UserManager<ApplicationUser,int>
+    public class ApplicationUserManager : UserManager<ApplicationUser, int>
     {
-        public ApplicationUserManager(IUserStore<ApplicationUser,int> store)
+        public ApplicationUserManager(IUserStore<ApplicationUser, int> store)
             : base(store)
         {
         }
-
-        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context) 
+       
+        public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
-           
+
             var manager = new ApplicationUserManager(new Models.OpenCoreWebUserStore(context.Get<OpenWebSiteEntities>()));
             // 設定使用者名稱的驗證邏輯
-            manager.UserValidator = new UserValidator<ApplicationUser,int>(manager)
+            manager.UserValidator = new UserValidator<ApplicationUser, int>(manager)
             {
                 AllowOnlyAlphanumericUserNames = false,
-                RequireUniqueEmail = true
+                RequireUniqueEmail = false
             };
 
             // 設定密碼的驗證邏輯
             manager.PasswordValidator = new PasswordValidator
             {
                 RequiredLength = 6,
-                RequireNonLetterOrDigit = true,
-                RequireDigit = true,
-                RequireLowercase = true,
-                RequireUppercase = true,
+                RequireNonLetterOrDigit = false,
+                RequireDigit = false,
+                RequireLowercase = false,
+                RequireUppercase = false,
             };
 
             // 設定使用者鎖定詳細資料
@@ -68,11 +67,11 @@ namespace OpenCoreWeb
 
             // 註冊雙因素驗證提供者。此應用程式使用手機和電子郵件接收驗證碼以驗證使用者
             // 您可以撰寫專屬提供者，並將它外掛到這裡。
-            manager.RegisterTwoFactorProvider("電話代碼", new PhoneNumberTokenProvider<ApplicationUser,int>
+            manager.RegisterTwoFactorProvider("電話代碼", new PhoneNumberTokenProvider<ApplicationUser, int>
             {
                 MessageFormat = "您的安全碼為 {0}"
             });
-            manager.RegisterTwoFactorProvider("電子郵件代碼", new EmailTokenProvider<ApplicationUser,int>
+            manager.RegisterTwoFactorProvider("電子郵件代碼", new EmailTokenProvider<ApplicationUser, int>
             {
                 Subject = "安全碼",
                 BodyFormat = "您的安全碼為 {0}"
@@ -82,8 +81,8 @@ namespace OpenCoreWeb
             var dataProtectionProvider = options.DataProtectionProvider;
             if (dataProtectionProvider != null)
             {
-                manager.UserTokenProvider = 
-                    new DataProtectorTokenProvider<ApplicationUser,int>(dataProtectionProvider.Create("ASP.NET Identity"));
+                manager.UserTokenProvider =
+                    new DataProtectorTokenProvider<ApplicationUser, int>(dataProtectionProvider.Create("ASP.NET Identity"));
             }
             return manager;
         }
@@ -91,7 +90,7 @@ namespace OpenCoreWeb
 
     public class ApplicationRoleManager : RoleManager<ApplicationRole, int>
     {
-        public ApplicationRoleManager(IRoleStore<ApplicationRole,int> store):
+        public ApplicationRoleManager(IRoleStore<ApplicationRole, int> store) :
             base(store)
         {
 

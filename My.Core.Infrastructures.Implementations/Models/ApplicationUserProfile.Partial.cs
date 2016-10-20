@@ -13,19 +13,16 @@ namespace My.Core.Infrastructures.Implementations.Models
     {
         [Required]
         public int Id { get; set; }
-        [StringLength(4096)]
         public string Address { get; set; }
         
         [StringLength(512, ErrorMessage="欄位長度不得大於 512 個字元")]
         [Required]
-        [DataType(DataType.EmailAddress)]
         public string EMail { get; set; }
         [Required]
         public bool EMailConfirmed { get; set; }
         
         [StringLength(10, ErrorMessage="欄位長度不得大於 10 個字元")]
         [Required]
-        [DataType(DataType.PhoneNumber)]
         public string PhoneNumber { get; set; }
         [Required]
         public bool PhoneConfirmed { get; set; }

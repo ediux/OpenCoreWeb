@@ -27,7 +27,6 @@ namespace My.Core.Infrastructures.Implementations.Models
     
         public virtual DbSet<ApplicationGroup> ApplicationGroup { get; set; }
         public virtual DbSet<ApplicationGroupTree> ApplicationGroupTree { get; set; }
-        public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
         public virtual DbSet<ApplicationUser> ApplicationUser { get; set; }
         public virtual DbSet<ApplicationUserGroup> ApplicationUserGroup { get; set; }
         public virtual DbSet<ApplicationUserProfile> ApplicationUserProfile { get; set; }
@@ -35,7 +34,8 @@ namespace My.Core.Infrastructures.Implementations.Models
         public virtual DbSet<ApplicationUserRole> ApplicationUserRole { get; set; }
         public virtual DbSet<UserOperationCodeDefine> UserOperationCodeDefine { get; set; }
         public virtual DbSet<UserOperationLog> UserOperationLog { get; set; }
-        public virtual DbSet<ApplicationUserClaim> ApplicationUserClaim { get; set; }
         public virtual DbSet<ApplicationUserLogin> ApplicationUserLogin { get; set; }
+        public virtual DbSet<ApplicationUserClaim> ApplicationUserClaim { get; set; }
+        public virtual DbSet<ApplicationRole> ApplicationRole { get; set; }
     }
 }

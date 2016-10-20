@@ -50,7 +50,7 @@ namespace My.Core.Infrastructures.Implementations
                     return;
                 }
 
-               
+
 
                 var founddefined = logdefinerepo.Find((int)code);
 
@@ -75,7 +75,7 @@ namespace My.Core.Infrastructures.Implementations
 
         }
 
-       
+
 
         protected virtual bool GetIsOnline(int memberid)
         {
@@ -108,6 +108,10 @@ namespace My.Core.Infrastructures.Implementations
         public override IList<ApplicationUser> BatchCreate(IEnumerable<ApplicationUser> entities)
         {
             var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
+            if (currentLoginedUser == null)
+                currentLoginedUser = ApplicationUser.Create();
+
             try
             {
                 WriteUserOperationLog(OperationCodeEnum.Account_BatchCreate_Start, currentLoginedUser);
@@ -129,6 +133,9 @@ namespace My.Core.Infrastructures.Implementations
         public ApplicationUser ChangePassword(ApplicationUser UpdatedUserData)
         {
             var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
+            if (currentLoginedUser == null)
+                currentLoginedUser = ApplicationUser.Create();
 
             try
             {
@@ -152,9 +159,14 @@ namespace My.Core.Infrastructures.Implementations
         {
             var currentLoginedUser = Find(GetCurrentLoginedUserId());
 
+            if (currentLoginedUser == null)
+                currentLoginedUser = ApplicationUser.Create();
+
             try
             {
                 WriteUserOperationLog(OperationCodeEnum.Account_Create_Start, currentLoginedUser);
+                entity.LastUpdateTime = entity.CreateTime = DateTime.Now.ToUniversalTime();
+                entity.LastUpdateUserId = entity.CreateUserId = currentLoginedUser.Id;
                 entity = base.Create(entity);
                 WriteUserOperationLog(OperationCodeEnum.Account_Create_End_Success, currentLoginedUser);
 
@@ -173,6 +185,9 @@ namespace My.Core.Infrastructures.Implementations
         public override void Delete(ApplicationUser entity)
         {
             var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
+            if (currentLoginedUser == null)
+                currentLoginedUser = ApplicationUser.Create();
 
             try
             {
@@ -224,6 +239,10 @@ namespace My.Core.Infrastructures.Implementations
         public ApplicationUser FindByEmail(string email)
         {
             var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
+            if (currentLoginedUser == null)
+                currentLoginedUser = ApplicationUser.Create();
+
             try
             {
                 IQueryable<ApplicationUser> queryset = _datatable.Include(i => i.ApplicationUserProfileRef);
@@ -245,6 +264,15 @@ namespace My.Core.Infrastructures.Implementations
                 throw ex;
             }
 
+        }
+
+        public override ApplicationUser Find(params object[] values)
+        {
+            var result = base.Find(values);
+            if (result == null)
+                result = ApplicationUser.Create();
+
+            return result;
         }
 
         public ApplicationUser FindUserById(int MemberId, bool isOnline)
@@ -293,6 +321,10 @@ namespace My.Core.Infrastructures.Implementations
         public ApplicationUser FindUserByLoginAccount(string LoginAccount, bool IsOnline)
         {
             var currentLoginedUser = Find(GetCurrentLoginedUserId());
+
+            if (currentLoginedUser == null)
+                currentLoginedUser = ApplicationUser.Create();
+
             try
             {
                 ApplicationUser _founduser = null;
@@ -329,15 +361,15 @@ namespace My.Core.Infrastructures.Implementations
         {
             try
             {
-               
+
 
                 var result = from q in _datatable
                              where q.ResetPasswordToken.Equals(Token, StringComparison.InvariantCulture)
                              select q;
 
-                 user = result.SingleOrDefault();
+                user = result.SingleOrDefault();
 
-                 return user.Id;
+                return user.Id;
             }
             catch (Exception ex)
             {
@@ -402,12 +434,19 @@ namespace My.Core.Infrastructures.Implementations
         {
             var currentLoginedUser = Find(GetCurrentLoginedUserId());
 
+            if (currentLoginedUser == null)
+                currentLoginedUser = ApplicationUser.Create();
+
             try
             {
                 WriteUserOperationLog(OperationCodeEnum.Account_Update_Start, currentLoginedUser);
                 entity.LastUpdateTime = DateTime.Now.ToUniversalTime();
+
                 entity.LastUpdateUserId = currentLoginedUser.Id;
-                base.Update(entity);
+                if (entity.Id <= 0 || entity == null)
+                    Create(entity);
+                else
+                    base.Update(entity);
                 WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, currentLoginedUser);
                 return entity;
             }

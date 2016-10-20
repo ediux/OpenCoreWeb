@@ -21,6 +21,7 @@ namespace My.Core.Infrastructures.Implementations
         public RepositoryBase(IUnitofWork unitofwork)
         {
             _unitofwork = unitofwork;
+            _datatable = (DbSet<TEntity>)_unitofwork.GetEntity<TEntity>();
         }
 
         #region Helper Functions
@@ -80,6 +81,7 @@ namespace My.Core.Infrastructures.Implementations
                 var state = _unitofwork.GetEntry<TEntity>(entity);
                 state.State = EntityState.Added;
                 TEntity inserteduser = _datatable.Add((TEntity)entity);
+                SaveChanges();
                 return inserteduser;
             }
             catch (Exception ex)
@@ -94,6 +96,7 @@ namespace My.Core.Infrastructures.Implementations
             try
             {
                 IList<TEntity> result = ((DbSet<TEntity>)_datatable).AddRange(entities).ToList();
+                SaveChanges();
                 return result;
             }
             catch (Exception ex)
@@ -163,6 +166,7 @@ namespace My.Core.Infrastructures.Implementations
                     deletedata.State = EntityState.Unchanged;
 
                 _datatable.Remove(entity);
+                SaveChanges();
             }
             catch (Exception ex)
             {

@@ -18,7 +18,7 @@ namespace My.Core.Infrastructures.Implementations.Models
         public int RoleId { get; set; }
         public bool Void { get; set; }
     
-        public virtual ApplicationRole ApplicationRole { get; set; }
         public virtual ApplicationUser ApplicationUser { get; set; }
+        public virtual ApplicationRole ApplicationRole { get; set; }
     }
 }

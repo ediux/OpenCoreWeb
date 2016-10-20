@@ -14,7 +14,6 @@ namespace My.Core.Infrastructures.Implementations.Models
         private bool _requireuniqueEmail=false;
         public bool RequireUniqueEmail { get { return _requireuniqueEmail; } set { _requireuniqueEmail = value; } }
 
-        private bool _disposed;
         private Hashtable _repositories;
 
         public OpenWebSiteEntities(string nameorconnectionstring)
@@ -25,13 +24,10 @@ namespace My.Core.Infrastructures.Implementations.Models
 
         public static OpenWebSiteEntities Create()
         {
-            return new OpenWebSiteEntities("name=Web");
+            return new OpenWebSiteEntities();
         }
 
-        public System.Data.Entity.IDbSet<TEntity> GetEntity<TEntity>() where TEntity : class
-        {
-            return this.GetEntity<TEntity>();
-        }
+      
 
         public System.Data.Entity.Infrastructure.DbEntityEntry<TEntity> GetEntry<TEntity>(TEntity entity) where TEntity : class
         {
@@ -62,6 +58,12 @@ namespace My.Core.Infrastructures.Implementations.Models
             }
 
             return (TRepository)_repositories[type];
+        }
+
+
+        public IDbSet<TEntity> GetEntity<TEntity>() where TEntity : class
+        {
+           return base.Set<TEntity>();
         }
     }
 }

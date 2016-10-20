@@ -3,9 +3,10 @@ namespace My.Core.Infrastructures.Implementations.Models
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
-    
+    using Microsoft.AspNet.Identity;
+
     [MetadataType(typeof(ApplicationUserClaimMetaData))]
-    public partial class ApplicationUserClaim 
+    public partial class ApplicationUserClaim
     {
     }
     

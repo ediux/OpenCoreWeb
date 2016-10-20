@@ -38,10 +38,29 @@ namespace OpenCoreWeb
             : base(store)
         {
         }
+        public async Task<bool> CheckAccountIsExist(ApplicationUser user)
+        {
+            try
+            {
+                var isexistedUser = await Store.FindByNameAsync(user.UserName);
+                if (isexistedUser != null && isexistedUser.Id > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
         public async override Task<IdentityResult> CreateAsync(ApplicationUser user)
         {
             try
             {
+                if (await CheckAccountIsExist(user))
+                    return IdentityResult.Failed("此帳號已存在!");
+
                 await Store.CreateAsync(user);
                 return IdentityResult.Success;
             }
@@ -55,6 +74,9 @@ namespace OpenCoreWeb
         {
             try
             {
+                if (await CheckAccountIsExist(user))
+                    return IdentityResult.Failed("此帳號已存在!");
+
                 user.Password = password;
                 user.PasswordHash = PasswordHasher.HashPassword(password);
                 user.ResetPasswordToken = await GeneratePasswordResetTokenAsync(user.Id);
@@ -81,7 +103,7 @@ namespace OpenCoreWeb
             {
                 return IdentityResult.Failed(ex.Message);
             }
-           
+
         }
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {

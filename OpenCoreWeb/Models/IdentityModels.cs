@@ -52,7 +52,7 @@ namespace OpenCoreWeb.Models
         SafeHandle handle = new SafeFileHandle(IntPtr.Zero, true);
         IUnitofWork uow;
         IApplicationUserRepository<ApplicationUser> accountrepo;
-        IApplicationRoleRepository<ApplicationRole> rolerepo;
+        IApplicationRoleRepository<ApplicationRole,ApplicationUserRole> rolerepo;
 
 
         public OpenCoreWebUserStore(DbContext context)
@@ -511,24 +511,31 @@ namespace OpenCoreWeb.Models
             return new Task(() =>
             {
                 role.Void = true;
-                rolerepo.Update(role);
-                rolerepo.SaveChanges();
+                UpdateAsync(role);
             });
         }
 
         Task<ApplicationRole> IRoleStore<ApplicationRole, int>.FindByIdAsync(int roleId)
         {
-            throw new System.NotImplementedException();
+            return new Task<ApplicationRole>(() => {
+               return rolerepo.FindById(roleId);
+            });
         }
 
         Task<ApplicationRole> IRoleStore<ApplicationRole, int>.FindByNameAsync(string roleName)
         {
-            throw new System.NotImplementedException();
+            return new Task<ApplicationRole>(() => {
+                return rolerepo.FindByName(roleName);
+            });
         }
 
         public Task UpdateAsync(ApplicationRole role)
         {
-            throw new System.NotImplementedException();
+            return new Task(() =>
+            {      
+                rolerepo.Update(role);
+                rolerepo.SaveChanges();
+            });
         }
         #endregion
 

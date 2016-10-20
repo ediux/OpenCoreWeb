@@ -4,8 +4,9 @@ using My.Core.Infrastructures.DAL;
 
 namespace My.Core.Infrastructures
 {
-    public interface IApplicationRoleRepository<IApplicationRole> : IRepositoryBase<IApplicationRole>
+    public interface IApplicationRoleRepository<IApplicationRole, TUserRole> : IRepositoryBase<IApplicationRole>
         where IApplicationRole : class
+        where TUserRole:class
     {
 
         /// <summary>
@@ -52,6 +53,12 @@ namespace My.Core.Infrastructures
         /// <param name="MemberId">Member identifier.</param>
         /// <param name="roleName">Role name.</param>
         bool IsInRole(int MemberId, string roleName);
+
+        TUserRole Find(int userId, IApplicationRole entity);
+        TUserRole CreateUserRole(TUserRole entity);
+        IEnumerable<TUserRole> BatchCreateUserRole(IEnumerable<TUserRole> entities);
+        void RemoveUserRole(TUserRole entity);
+        void RemoveUserRoleRange(IEnumerable<TUserRole> entities);
     }
 }
 

@@ -192,6 +192,7 @@
     <Compile Include="Repositories\ApplicationRoleRepository.cs" />
     <Compile Include="Repositories\RepositoryBase.cs" />
     <Compile Include="Repositories\UserOperationCodeDefineRepository.cs" />
+    <Compile Include="Repositories\UserOperationLogRepository.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\My.Core.Infrastructures\My.Core.Infrastructures.csproj">

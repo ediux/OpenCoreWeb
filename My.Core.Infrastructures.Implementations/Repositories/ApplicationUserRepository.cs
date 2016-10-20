@@ -16,11 +16,13 @@ namespace My.Core.Infrastructures.Implementations
     {
 
         private IUserOperationCodeDefineRepository<UserOperationCodeDefine> logdefinerepo;
+        private IUserOperationLogRepository<UserOperationLog> logrepo;
 
         public ApplicationUserRepository(IUnitofWork unitofwork)
             : base(unitofwork)
         {
             logdefinerepo = _unitofwork.GetRepository<UserOperationCodeDefineRepository, UserOperationCodeDefine>() as IUserOperationCodeDefineRepository<UserOperationCodeDefine>;
+            logrepo = _unitofwork.GetRepository<UserOperationLogRepository, UserOperationLog>() as IUserOperationLogRepository<UserOperationLog>;
         }
 
         #region Helper Functions
@@ -34,7 +36,11 @@ namespace My.Core.Infrastructures.Implementations
         {
             try
             {
-                //IRepositoryBase<UserOperationLog> useroperationlog = _unitofwork.GetRepository<UserOperationLog>();
+
+                if (User == null)
+                {
+                    return;
+                }
 
                 string _url = string.Empty;
                 string _body = string.Empty;
@@ -45,52 +51,15 @@ namespace My.Core.Infrastructures.Implementations
                     _body = Newtonsoft.Json.JsonConvert.SerializeObject(System.Web.HttpContext.Current.Request.Form);
                 }
 
-                var kernelUser = FindUserByLoginAccount("System", false);
-
-                if (User == null)
-                {
-                    return;
-                }
-
-                if (string.IsNullOrEmpty(User.UserName))
-                {
-                    User = ApplicationUser.CreateKernelUser();
-                    User = base.Create(User);
-                    SaveChanges();
-                }
-
-                if (User.Id == -1)
-                {
-                    User = ApplicationUser.CreateKernelUser();
-                    User = base.Create(User);
-                    SaveChanges();
-                }
-
-
-                var founddefined = logdefinerepo.Find((int)code);
-
-                if (founddefined == null)
-                {
-                    logdefinerepo.Create(new UserOperationCodeDefine()
-                    {
-                        Description = "自動產生",
-                        MessageResourceKey = "",
-                        OpreationCode = (int)code
-                    });
-                    SaveChanges();
-                    founddefined = logdefinerepo.Find((int)code);
-                }
-
-                User.UserOperationLog.Add(new UserOperationLog()
+                logrepo.Create(new UserOperationLog()
                 {
                     Body = _body,
                     UserId = User.Id,
                     LogTime = DateTime.Now,
-                    OpreationCode = founddefined.OpreationCode,
+                    OpreationCode = (int)code,
                     URL = _url
                 });
 
-                base.Update(User);
                 SaveChanges();
 
                 //_unitofwork.GetEntry<ApplicationUser>(User).State = EntityState.Modified;
@@ -102,8 +71,6 @@ namespace My.Core.Infrastructures.Implementations
             }
 
         }
-
-
 
         protected virtual bool GetIsOnline(int memberid)
         {
@@ -183,9 +150,9 @@ namespace My.Core.Infrastructures.Implementations
 
             try
             {
-                var isexists = Find(entity.Id);
-                
-                if (isexists!=null)
+                var isexists = FindUserByLoginAccount(entity.UserName, false);
+
+                if (isexists != null && isexists.Id > 0)
                 {
                     throw new Exception("User is existed.");
                 }
@@ -317,17 +284,7 @@ namespace My.Core.Infrastructures.Implementations
                         }
                     }
                 }
-                //WriteUserOperationLog(OperationCodeEnum.Account_FindById_Start, _founduser);
-                //if (isOnline)
-                //{
-                //    WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Online, _founduser);
-                //    WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, _founduser);
-                //}
-                //else
-                //{
-                //    WriteUserOperationLog(OperationCodeEnum.Account_FLAG_Offline, _founduser);
-                //}
-                //WriteUserOperationLog(OperationCodeEnum.Account_FindById_End_Success, _founduser);
+
                 return _founduser;
             }
             catch (Exception ex)
@@ -499,12 +456,12 @@ namespace My.Core.Infrastructures.Implementations
             {
                 WriteUserOperationLog(OperationCodeEnum.Account_Update_Start, currentLoginedUser);
                 entity.LastUpdateTime = DateTime.Now.ToUniversalTime();
-
                 entity.LastUpdateUserId = currentLoginedUser.Id;
-                if (entity.Id <= 0 || entity == null)
-                    Create(entity);
-                else
+                var entry = _unitofwork.GetEntry<ApplicationUser>(entity);
+
+                if (entry != null && entry.State == EntityState.Modified)
                     base.Update(entity);
+
                 WriteUserOperationLog(OperationCodeEnum.Account_Update_End_Success, currentLoginedUser);
                 return entity;
             }

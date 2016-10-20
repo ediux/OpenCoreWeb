@@ -38,37 +38,51 @@ namespace OpenCoreWeb
             : base(store)
         {
         }
-        public override Task<IdentityResult> CreateAsync(ApplicationUser user)
+        public async override Task<IdentityResult> CreateAsync(ApplicationUser user)
         {
-            return Task<IdentityResult>.Run(() =>
+            try
             {
-                try
-                {
-                    return base.CreateAsync(user).Result;
-                }
-                catch (Exception ex)
-                {
-                    return new IdentityResult(ex.Message);
-                }
-            });
+                await Store.CreateAsync(user);
+                return IdentityResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return IdentityResult.Failed(ex.Message);
+            }
         }
 
-        public override Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
+        public async override Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
         {
-            return Task<IdentityResult>.Run(() =>
+            try
             {
-                try
-                {
-                    user.Password = password;
-                    return base.CreateAsync(user).Result;
-                }
-                catch (Exception ex)
-                {
-                    return new IdentityResult(ex.Message);
-                }
-            });
+                user.Password = password;
+                user.PasswordHash = PasswordHasher.HashPassword(password);
+                user.ResetPasswordToken = await GeneratePasswordResetTokenAsync(user.Id);
+                await base.CreateAsync(user);
+                return IdentityResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return IdentityResult.Failed(ex.Message);
+            }
         }
 
+        protected async override Task<IdentityResult> UpdatePassword(IUserPasswordStore<ApplicationUser, int> passwordStore, ApplicationUser user, string newPassword)
+        {
+            try
+            {
+                user.Password = newPassword;
+                user.PasswordHash = PasswordHasher.HashPassword(newPassword);
+                user.ResetPasswordToken = await GeneratePasswordResetTokenAsync(user.Id);
+                await base.UpdateAsync(user);
+                return IdentityResult.Success;
+            }
+            catch (Exception ex)
+            {
+                return IdentityResult.Failed(ex.Message);
+            }
+           
+        }
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
 

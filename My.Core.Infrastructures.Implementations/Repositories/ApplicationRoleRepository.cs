@@ -17,7 +17,7 @@ namespace My.Core.Infrastructures.Implementations
             : base(unitofwork)
         {
 
-            accountrepo = _unitofwork.GetRepository<IApplicationUserRepository<ApplicationUser>, ApplicationUser>();
+            accountrepo = _unitofwork.GetRepository<ApplicationUserRepository, ApplicationUser>();
             userRoleTable = _unitofwork.GetEntity<ApplicationUserRole>() as DbSet<ApplicationUserRole>;
         }
 

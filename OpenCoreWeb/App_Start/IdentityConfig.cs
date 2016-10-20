@@ -38,7 +38,37 @@ namespace OpenCoreWeb
             : base(store)
         {
         }
-       
+        public override Task<IdentityResult> CreateAsync(ApplicationUser user)
+        {
+            return Task<IdentityResult>.Run(() =>
+            {
+                try
+                {
+                    return base.CreateAsync(user).Result;
+                }
+                catch (Exception ex)
+                {
+                    return new IdentityResult(ex.Message);
+                }
+            });
+        }
+
+        public override Task<IdentityResult> CreateAsync(ApplicationUser user, string password)
+        {
+            return Task<IdentityResult>.Run(() =>
+            {
+                try
+                {
+                    user.Password = password;
+                    return base.CreateAsync(user).Result;
+                }
+                catch (Exception ex)
+                {
+                    return new IdentityResult(ex.Message);
+                }
+            });
+        }
+
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
 

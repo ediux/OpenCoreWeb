@@ -10,6 +10,23 @@
     <h4>變更帳戶設定</h4>
     <hr />
     <dl class="dl-horizontal">
+        <dt>基本資料:</dt>
+        <dd>
+            [
+            @if (Model.HasProfile)
+            {
+                @Html.ActionLink("編輯", "Edit", "UserProfiles", new { id = Model.ProfileId },null)
+            }
+            else
+            {
+                @Html.ActionLink("建立", "Create", "UserProfiles")
+            }
+            ]
+        </dd>
+        <dt>角色:</dt>
+        <dd>[ @Html.ActionLink("管理", "Index", "Roles")]</dd>
+        <dt>群組:</dt>
+        <dd>[ @Html.ActionLink("管理", "Index", "Groups")]</dd>
         <dt>密碼:</dt>
         <dd>
             [
@@ -30,13 +47,13 @@
         </dd>
         @*
             電話號碼可以當做雙因素驗證系統中的第二個驗證因素。
-             
+
              請參閱<a href="http://go.microsoft.com/fwlink/?LinkId=403804">此文章</a>
                 以了解設定此 ASP.NET 應用程式以支援使用 SMS 進行雙因素驗證的詳細資料。
-             
+
             雙因素驗證設定完成之後，請取消註解以下區塊
         *@
-        @*  
+        @*
             <dt>電話號碼:</dt>
             <dd>
                 @(Model.PhoneNumber ?? "None") [
@@ -82,3 +99,6 @@
         </dd>
     </dl>
 </div>
+
+
+

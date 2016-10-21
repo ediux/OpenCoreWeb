@@ -166,9 +166,14 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
+    <Compile Include="Controllers\ApplicationUserProfileRefsController.cs" />
+    <Compile Include="Controllers\GroupsController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\RolesController.cs" />
+    <Compile Include="Controllers\UserGroupsController.cs" />
+    <Compile Include="Controllers\UserProfilesController.cs" />
+    <Compile Include="Controllers\UserRolesController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
@@ -187,6 +192,7 @@
     <Content Include="Content\Site.css" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
+    <Content Include="App_Code\RazorHelpFunctions.cshtml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
@@ -239,9 +245,42 @@
     <Content Include="Views\Roles\Details.cshtml" />
     <Content Include="Views\Roles\Edit.cshtml" />
     <Content Include="Views\Roles\Index.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\VoidDisplay.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\VoidDisplay.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\UserIDMappingDisplay.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\UserIDMappingDisplay.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\LockedStateDispaly.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\LockedStateDispaly.cshtml" />
+    <Content Include="Views\Groups\Create.cshtml" />
+    <Content Include="Views\Groups\Delete.cshtml" />
+    <Content Include="Views\Groups\Details.cshtml" />
+    <Content Include="Views\Groups\Edit.cshtml" />
+    <Content Include="Views\Groups\Index.cshtml" />
+    <Content Include="Views\UserRoles\Create.cshtml" />
+    <Content Include="Views\UserRoles\Delete.cshtml" />
+    <Content Include="Views\UserRoles\Details.cshtml" />
+    <Content Include="Views\UserRoles\Edit.cshtml" />
+    <Content Include="Views\UserRoles\Index.cshtml" />
+    <Content Include="Views\UserGroups\Create.cshtml" />
+    <Content Include="Views\UserGroups\Delete.cshtml" />
+    <Content Include="Views\UserGroups\Details.cshtml" />
+    <Content Include="Views\UserGroups\Edit.cshtml" />
+    <Content Include="Views\UserGroups\Index.cshtml" />
+    <Content Include="Views\UserProfiles\Create.cshtml" />
+    <Content Include="Views\UserProfiles\Delete.cshtml" />
+    <Content Include="Views\UserProfiles\Details.cshtml" />
+    <Content Include="Views\UserProfiles\Edit.cshtml" />
+    <Content Include="Views\UserProfiles\Index.cshtml" />
+    <Content Include="Views\ApplicationUserProfileRefs\Create.cshtml" />
+    <Content Include="Views\ApplicationUserProfileRefs\Delete.cshtml" />
+    <Content Include="Views\ApplicationUserProfileRefs\Details.cshtml" />
+    <Content Include="Views\ApplicationUserProfileRefs\Edit.cshtml" />
+    <Content Include="Views\ApplicationUserProfileRefs\Index.cshtml" />
+    <Content Include="Views\Shared\DisplayTemplates\UTCLocalTimeDisplay.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="App_GlobalResources\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

@@ -11,6 +11,7 @@ namespace My.Core.Infrastructures.Implementations.Models
     
     public partial class UserOperationLogMetaData
     {
+        [Display(Name = "Id", ResourceType = typeof(ReslangMUI.MUI))]
         [Required]
         public long Id { get; set; }
         public string Body { get; set; }

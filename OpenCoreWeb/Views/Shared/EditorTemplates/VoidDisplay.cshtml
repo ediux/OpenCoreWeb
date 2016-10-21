@@ -1,0 +1,9 @@
+﻿@{ ViewData[ViewData.TemplateInfo.HtmlFieldPrefix] = ViewData.TemplateInfo.FormattedModelValue;
+ var dropdownlistitems = new List<SelectListItem>();
+ dropdownlistitems.Add(new SelectListItem() { Text="啟用", Value="false" });
+ dropdownlistitems.Add(new SelectListItem() { Text = "停用", Value = "true" });
+}
+    @Html.DropDownList(ViewData.TemplateInfo.HtmlFieldPrefix,
+    dropdownlistitems, new { @class = "control-label col-md-2" })
+    @Html.ValidationMessage(ViewData.TemplateInfo.HtmlFieldPrefix, "", new { @class = "text-danger" })
+

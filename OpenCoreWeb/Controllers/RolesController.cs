@@ -7,9 +7,11 @@ using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using My.Core.Infrastructures.Implementations.Models;
+using Microsoft.AspNet.Identity;
 
 namespace OpenCoreWeb.Controllers
 {
+    [Authorize]
     public class RolesController : Controller
     {
         private OpenWebSiteEntities db = new OpenWebSiteEntities();
@@ -17,7 +19,7 @@ namespace OpenCoreWeb.Controllers
         // GET: Roles
         public ActionResult Index()
         {
-            return View(db.ApplicationRole.ToList());
+            return View(db.ApplicationRole.Where(w => w.Void == false).ToList());
         }
 
         // GET: Roles/Details/5
@@ -38,7 +40,9 @@ namespace OpenCoreWeb.Controllers
         // GET: Roles/Create
         public ActionResult Create()
         {
-            return View();
+            var model = ApplicationRole.Create();
+            model.CreateUserId = model.LastUpdateUserId = User.Identity.GetUserId<int>();
+            return View(model);
         }
 
         // POST: Roles/Create
@@ -50,7 +54,26 @@ namespace OpenCoreWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                db.ApplicationRole.Add(applicationRole);
+                var roles = db.ApplicationRole.Where(w => w.Name == applicationRole.Name);
+                if (roles.Any())
+                {
+                    var role = roles.Single();
+
+                    role.Name = applicationRole.Name;
+                    role.Void = false;
+                    role.CreateUserId = role.LastUpdateUserId = User.Identity.GetUserId<int>();
+                    role.CreateTime = role.LastUpdateTime = DateTime.Now.ToUniversalTime();
+                    if (role.ApplicationUserRole.Any())
+                    {
+                        role.ApplicationUserRole.Clear();
+                    }
+                    db.Entry(role).State = EntityState.Modified;
+                }
+                else
+                {
+                    db.ApplicationRole.Add(applicationRole);
+                }
+
                 db.SaveChanges();
                 return RedirectToAction("Index");
             }
@@ -66,10 +89,15 @@ namespace OpenCoreWeb.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             ApplicationRole applicationRole = db.ApplicationRole.Find(id);
+
             if (applicationRole == null)
             {
                 return HttpNotFound();
             }
+
+            applicationRole.LastUpdateTime = DateTime.Now.ToUniversalTime();
+            applicationRole.LastUpdateUserId = User.Identity.GetUserId<int>();
+
             return View(applicationRole);
         }
 
@@ -97,6 +125,7 @@ namespace OpenCoreWeb.Controllers
                 return new HttpStatusCodeResult(HttpStatusCode.BadRequest);
             }
             ApplicationRole applicationRole = db.ApplicationRole.Find(id);
+
             if (applicationRole == null)
             {
                 return HttpNotFound();
@@ -110,7 +139,9 @@ namespace OpenCoreWeb.Controllers
         public ActionResult DeleteConfirmed(int id)
         {
             ApplicationRole applicationRole = db.ApplicationRole.Find(id);
-            db.ApplicationRole.Remove(applicationRole);
+            //db.ApplicationRole.Remove(applicationRole);
+            applicationRole.Void = true;
+            db.Entry(applicationRole).State = EntityState.Modified;
             db.SaveChanges();
             return RedirectToAction("Index");
         }

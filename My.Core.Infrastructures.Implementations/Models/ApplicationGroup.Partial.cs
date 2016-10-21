@@ -11,6 +11,7 @@ namespace My.Core.Infrastructures.Implementations.Models
     
     public partial class ApplicationGroupMetaData
     {
+        [Display(Name = "Id", ResourceType = typeof(ReslangMUI.MUI))]
         [Required]
         public int Id { get; set; }
         
@@ -18,14 +19,26 @@ namespace My.Core.Infrastructures.Implementations.Models
         [Required]
         public string Name { get; set; }
         [Required]
+        [UIHint("VoidDisplay")]
+        [Display(Name = "Void", ResourceType = typeof(ReslangMUI.MUI))]
         public bool Void { get; set; }
+        [Display(Name = "CreateUserId", ResourceType = typeof(ReslangMUI.MUI))]
         [Required]
+        [UIHint("UserIDMappingDisplay")]
         public int CreateUserId { get; set; }
         [Required]
+        [Display(Name = "CreateTime", ResourceType = typeof(ReslangMUI.MUI))]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm}")]
+        [UIHint("UTCLocalTimeDisplay")]
         public System.DateTime CreateTime { get; set; }
         [Required]
+        [Display(Name = "LastUpdateUserId", ResourceType = typeof(ReslangMUI.MUI))]
+        [UIHint("UserIDMappingDisplay")]
         public int LastUpdateUserId { get; set; }
         [Required]
+        [Display(Name = "LastUpdateTime", ResourceType = typeof(ReslangMUI.MUI))]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm}")]
+        [UIHint("UTCLocalTimeDisplay")]
         public System.DateTime LastUpdateTime { get; set; }
     
         public virtual ICollection<ApplicationGroupTree> ApplicationGroupTree { get; set; }

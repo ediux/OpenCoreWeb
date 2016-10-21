@@ -1,0 +1,13 @@
+﻿@{ ViewData[ViewData.TemplateInfo.HtmlFieldPrefix] = ViewData.TemplateInfo.FormattedModelValue;
+ int userId = (int)ViewData.TemplateInfo.FormattedModelValue;
+ if (userId == -1)
+ {
+    @Html.Raw("訪客")
+ }
+ else
+ {
+     @RazorHelpFunctions.GetUserName((int)ViewData.TemplateInfo.FormattedModelValue)
+ }
+
+
+}

@@ -16,6 +16,8 @@ namespace My.Core.Infrastructures.Implementations.Models
         [Required]
         public int RoleId { get; set; }
         [Required]
+        [UIHint("VoidDisplay")]
+        [Display(Name = "Void", ResourceType = typeof(ReslangMUI.MUI))]
         public bool Void { get; set; }
     
         public virtual ApplicationRole ApplicationRole { get; set; }

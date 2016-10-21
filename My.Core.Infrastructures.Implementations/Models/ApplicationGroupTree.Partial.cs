@@ -11,6 +11,7 @@ namespace My.Core.Infrastructures.Implementations.Models
     
     public partial class ApplicationGroupTreeMetaData
     {
+        [Display(Name = "Id", ResourceType = typeof(ReslangMUI.MUI))]
         [Required]
         public int Id { get; set; }
         [Required]
@@ -20,6 +21,8 @@ namespace My.Core.Infrastructures.Implementations.Models
         [Required]
         public int Level { get; set; }
         [Required]
+        [UIHint("VoidDisplay")]
+        [Display(Name = "Void", ResourceType = typeof(ReslangMUI.MUI))]
         public bool Void { get; set; }
     
         public virtual ApplicationGroup ApplicationGroup { get; set; }

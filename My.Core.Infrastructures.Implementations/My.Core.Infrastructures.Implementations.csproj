@@ -177,6 +177,11 @@
     <Compile Include="Models\UserOperationLog.Partial.cs">
       <DependentUpon>EFGeneratePartialClass.tt</DependentUpon>
     </Compile>
+    <Compile Include="MUI.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>MUI.resx</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Models\ApplicationRole.cs">
       <DependentUpon>ApplicationDbModel.tt</DependentUpon>
@@ -200,7 +205,13 @@
       <Name>My.Core.Infrastructures</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="MUI.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>MUI.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>ReslangMUI</CustomToolNamespace>
+    </EmbeddedResource>
+  </ItemGroup>
   <ItemGroup>
     <EntityDeploy Include="Models\ApplicationDbModel.edmx">
       <Generator>EntityModelCodeGenerator</Generator>

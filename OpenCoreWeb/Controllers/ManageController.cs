@@ -65,14 +65,25 @@ namespace OpenCoreWeb.Controllers
                 : "";
 
             var userId = User.Identity.GetUserId<int>();
+            var user = UserManager.FindById(userId);
+            
             var model = new IndexViewModel
             {
+                UserId = userId,
                 HasPassword = HasPassword(),
+                ProfileId = 0,
+                HasProfile = user.ApplicationUserProfileRef.Any(),
                 PhoneNumber = await UserManager.GetPhoneNumberAsync(userId),
                 TwoFactor = await UserManager.GetTwoFactorEnabledAsync(userId),
                 Logins = await UserManager.GetLoginsAsync(userId),
                 BrowserRemembered = await AuthenticationManager.TwoFactorBrowserRememberedAsync(userId)
             };
+            if (user != null && user.ApplicationUserProfileRef.Any())
+            {
+                var profile = user.ApplicationUserProfileRef.Single();
+                model.ProfileId = profile.ApplicationUserProfile.Id;
+            }
+
             return View(model);
         }
 

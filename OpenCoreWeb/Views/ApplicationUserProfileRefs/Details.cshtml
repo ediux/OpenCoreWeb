@@ -1,0 +1,58 @@
+﻿@model My.Core.Infrastructures.Implementations.Models.ApplicationUserProfileRef
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>ApplicationUserProfileRef</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Void)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Void)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.CreateTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.CreateTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastUpdateTime)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastUpdateTime)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApplicationUser.UserName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApplicationUser.UserName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.ApplicationUserProfile.Address)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.ApplicationUserProfile.Address)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

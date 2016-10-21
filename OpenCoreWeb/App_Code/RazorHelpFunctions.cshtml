@@ -1,0 +1,17 @@
+﻿@functions{
+    public static string GetUserName(int id)
+    {
+       
+        My.Core.Infrastructures.Implementations.ApplicationUserRepository userrepo = new My.Core.Infrastructures.Implementations.ApplicationUserRepository(new My.Core.Infrastructures.Implementations.Models.OpenWebSiteEntities());
+
+        var usr = userrepo.Find(id);
+
+        if (usr.ApplicationUserProfileRef.Any())
+        {
+            var profile = usr.ApplicationUserProfileRef.Single();
+            return profile.ApplicationUserProfile.DisplayName;
+        }
+
+        return usr.UserName;
+    }
+}

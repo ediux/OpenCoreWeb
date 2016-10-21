@@ -1,0 +1,9 @@
+﻿@{ ViewData[ViewData.TemplateInfo.HtmlFieldPrefix] = ViewData.TemplateInfo.FormattedModelValue; }
+@if (((bool)ViewData.TemplateInfo.FormattedModelValue))
+{
+    @Html.Raw("已鎖定")
+}
+else
+{
+    @Html.Raw("已解除")
+}

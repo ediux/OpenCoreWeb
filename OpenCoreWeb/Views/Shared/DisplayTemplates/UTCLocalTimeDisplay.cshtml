@@ -1,0 +1,5 @@
+﻿@{ ViewData[ViewData.TemplateInfo.HtmlFieldPrefix] = ViewData.TemplateInfo.FormattedModelValue;
+   DateTime OriTime = DateTime.Parse((string) ViewData.TemplateInfo.FormattedModelValue);
+   DateTime UTCTime = new DateTime(OriTime.Ticks, DateTimeKind.Utc).ToLocalTime();
+}
+@UTCTime.ToString("yyyy/MM/dd tt hh:mm")

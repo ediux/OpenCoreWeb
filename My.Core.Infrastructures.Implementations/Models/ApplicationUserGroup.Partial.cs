@@ -16,6 +16,8 @@ namespace My.Core.Infrastructures.Implementations.Models
         [Required]
         public int GroupId { get; set; }
         [Required]
+        [UIHint("VoidDisplay")]
+        [Display(Name = "Void", ResourceType = typeof(ReslangMUI.MUI))]
         public bool Void { get; set; }
     
         public virtual ApplicationGroup ApplicationGroup { get; set; }

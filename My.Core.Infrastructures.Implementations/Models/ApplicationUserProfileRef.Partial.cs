@@ -16,10 +16,18 @@ namespace My.Core.Infrastructures.Implementations.Models
         [Required]
         public int ProfileId { get; set; }
         [Required]
+        [UIHint("VoidDisplay")]
+        [Display(Name = "Void", ResourceType = typeof(ReslangMUI.MUI))]
         public bool Void { get; set; }
         [Required]
+        [Display(Name = "CreateTime", ResourceType = typeof(ReslangMUI.MUI))]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm}")]
+        [UIHint("UTCLocalTimeDisplay")]
         public System.DateTime CreateTime { get; set; }
         [Required]
+        [Display(Name = "LastUpdateTime", ResourceType = typeof(ReslangMUI.MUI))]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd hh:mm}")]
+        [UIHint("UTCLocalTimeDisplay")]
         public System.DateTime LastUpdateTime { get; set; }
     
         public virtual ApplicationUser ApplicationUser { get; set; }

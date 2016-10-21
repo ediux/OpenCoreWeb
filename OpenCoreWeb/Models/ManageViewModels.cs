@@ -7,7 +7,10 @@ namespace OpenCoreWeb.Models
 {
     public class IndexViewModel
     {
+        public int UserId { get; set; }
         public bool HasPassword { get; set; }
+        public bool HasProfile { get; set; }
+        public int ProfileId { get; set; }
         public IList<UserLoginInfo> Logins { get; set; }
         public string PhoneNumber { get; set; }
         public bool TwoFactor { get; set; }

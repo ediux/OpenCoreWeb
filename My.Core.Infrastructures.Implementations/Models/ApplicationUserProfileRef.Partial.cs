@@ -12,8 +12,11 @@ namespace My.Core.Infrastructures.Implementations.Models
     public partial class ApplicationUserProfileRefMetaData
     {
         [Required]
+        [Display(Name = "UserName", ResourceType = typeof(ReslangMUI.MUI))]
+        [UIHint("UserIDMappingDisplay")]
         public int UserId { get; set; }
         [Required]
+        [Display(Name = "ProfileId", ResourceType = typeof(ReslangMUI.MUI))]
         public int ProfileId { get; set; }
         [Required]
         [UIHint("VoidDisplay")]

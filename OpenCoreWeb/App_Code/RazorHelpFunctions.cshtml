@@ -14,4 +14,19 @@
 
         return usr.UserName;
     }
+
+    public static string GetRoleName(int RoleId)
+    {
+        My.Core.Infrastructures.Implementations.ApplicationRoleRepository rolerepo = new My.Core.Infrastructures.Implementations.ApplicationRoleRepository(new My.Core.Infrastructures.Implementations.Models.OpenWebSiteEntities());
+
+        var role = rolerepo.Find(RoleId);
+
+        if (role!=null)
+        {
+
+            return role.Name;
+        }
+
+        return "";
+    }
 }

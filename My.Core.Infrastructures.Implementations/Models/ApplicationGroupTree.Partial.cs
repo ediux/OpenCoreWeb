@@ -15,10 +15,13 @@ namespace My.Core.Infrastructures.Implementations.Models
         [Required]
         public int Id { get; set; }
         [Required]
+        [Display(Name = "ParentId", ResourceType = typeof(ReslangMUI.MUI))]
         public int ParentId { get; set; }
         [Required]
+        [Display(Name = "ChildId", ResourceType = typeof(ReslangMUI.MUI))]
         public int ChildId { get; set; }
         [Required]
+        [Display(Name = "Level", ResourceType = typeof(ReslangMUI.MUI))]
         public int Level { get; set; }
         [Required]
         [UIHint("VoidDisplay")]

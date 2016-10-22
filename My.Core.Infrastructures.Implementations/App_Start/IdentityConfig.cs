@@ -109,7 +109,7 @@ namespace OpenCoreWeb
         public static ApplicationUserManager Create(IdentityFactoryOptions<ApplicationUserManager> options, IOwinContext context)
         {
 
-            var manager = new ApplicationUserManager(new Models.OpenCoreWebUserStore(context.Get<OpenWebSiteEntities>()));
+            var manager = new ApplicationUserManager(new OpenCoreWebUserStore(context.Get<OpenWebSiteEntities>()));
             // 設定使用者名稱的驗證邏輯
             manager.UserValidator = new UserValidator<ApplicationUser, int>(manager)
             {
@@ -165,7 +165,7 @@ namespace OpenCoreWeb
 
         public static ApplicationRoleManager Create(IdentityFactoryOptions<ApplicationRoleManager> options, IOwinContext context)
         {
-            var roleManager = new ApplicationRoleManager(new Models.OpenCoreWebUserStore(context.Get<OpenWebSiteEntities>()));
+            var roleManager = new ApplicationRoleManager(new OpenCoreWebUserStore(context.Get<OpenWebSiteEntities>()));
             roleManager.RoleValidator = new RoleValidator<ApplicationRole, int>(roleManager);
 
             return roleManager;

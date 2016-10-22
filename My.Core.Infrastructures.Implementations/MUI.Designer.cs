@@ -61,6 +61,60 @@ namespace ReslangMUI {
         }
         
         /// <summary>
+        ///   查詢類似 登入失敗次數 的當地語系化字串。
+        /// </summary>
+        public static string AccessFailedCount {
+            get {
+                return ResourceManager.GetString("AccessFailedCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 住址 的當地語系化字串。
+        /// </summary>
+        public static string Address {
+            get {
+                return ResourceManager.GetString("Address", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 內文 的當地語系化字串。
+        /// </summary>
+        public static string Body {
+            get {
+                return ResourceManager.GetString("Body", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 子群組 的當地語系化字串。
+        /// </summary>
+        public static string ChildId {
+            get {
+                return ResourceManager.GetString("ChildId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 宣告類型 的當地語系化字串。
+        /// </summary>
+        public static string ClaimType {
+            get {
+                return ResourceManager.GetString("ClaimType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 宣告值 的當地語系化字串。
+        /// </summary>
+        public static string ClaimValue {
+            get {
+                return ResourceManager.GetString("ClaimValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查詢類似 建立時間 的當地語系化字串。
         /// </summary>
         public static string CreateTime {
@@ -79,6 +133,15 @@ namespace ReslangMUI {
         }
         
         /// <summary>
+        ///   查詢類似 說明描述 的當地語系化字串。
+        /// </summary>
+        public static string Description {
+            get {
+                return ResourceManager.GetString("Description", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查詢類似 顯示名稱 的當地語系化字串。
         /// </summary>
         public static string DisplayName {
@@ -88,11 +151,74 @@ namespace ReslangMUI {
         }
         
         /// <summary>
+        ///   查詢類似 電子郵件地址 的當地語系化字串。
+        /// </summary>
+        public static string EMail {
+            get {
+                return ResourceManager.GetString("EMail", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 電子郵件驗證狀態 的當地語系化字串。
+        /// </summary>
+        public static string EMailConfirmed {
+            get {
+                return ResourceManager.GetString("EMailConfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 群組識別碼 的當地語系化字串。
+        /// </summary>
+        public static string GroupId {
+            get {
+                return ResourceManager.GetString("GroupId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 群組名稱 的當地語系化字串。
+        /// </summary>
+        public static string GroupName {
+            get {
+                return ResourceManager.GetString("GroupName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查詢類似 識別碼 的當地語系化字串。
         /// </summary>
-        public static string ID {
+        public static string Id {
             get {
-                return ResourceManager.GetString("ID", resourceCulture);
+                return ResourceManager.GetString("Id", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 最後活動時間 的當地語系化字串。
+        /// </summary>
+        public static string LastActivityTime {
+            get {
+                return ResourceManager.GetString("LastActivityTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 最後一次登入失敗時間 的當地語系化字串。
+        /// </summary>
+        public static string LastLoginFailTime {
+            get {
+                return ResourceManager.GetString("LastLoginFailTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 最後解除鎖定時間 的當地語系化字串。
+        /// </summary>
+        public static string LastUnlockedTime {
+            get {
+                return ResourceManager.GetString("LastUnlockedTime", resourceCulture);
             }
         }
         
@@ -115,11 +241,182 @@ namespace ReslangMUI {
         }
         
         /// <summary>
+        ///   查詢類似 存取層級 的當地語系化字串。
+        /// </summary>
+        public static string Level {
+            get {
+                return ResourceManager.GetString("Level", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 鎖定狀態 的當地語系化字串。
+        /// </summary>
+        public static string LockoutEnabled {
+            get {
+                return ResourceManager.GetString("LockoutEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 鎖定結束日期 的當地語系化字串。
+        /// </summary>
+        public static string LockoutEndDate {
+            get {
+                return ResourceManager.GetString("LockoutEndDate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 登入提供者名稱 的當地語系化字串。
+        /// </summary>
+        public static string LoginProvider {
+            get {
+                return ResourceManager.GetString("LoginProvider", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 紀錄時間 的當地語系化字串。
+        /// </summary>
+        public static string LogTime {
+            get {
+                return ResourceManager.GetString("LogTime", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 操作者 的當地語系化字串。
+        /// </summary>
+        public static string LogUserName {
+            get {
+                return ResourceManager.GetString("LogUserName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 本地化訊息識別碼 的當地語系化字串。
+        /// </summary>
+        public static string MessageResourceKey {
+            get {
+                return ResourceManager.GetString("MessageResourceKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 操作紀錄代碼 的當地語系化字串。
+        /// </summary>
+        public static string OpreationCode {
+            get {
+                return ResourceManager.GetString("OpreationCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 父群組 的當地語系化字串。
+        /// </summary>
+        public static string ParentId {
+            get {
+                return ResourceManager.GetString("ParentId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 密碼 的當地語系化字串。
+        /// </summary>
+        public static string Password {
+            get {
+                return ResourceManager.GetString("Password", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 加密後密碼 的當地語系化字串。
+        /// </summary>
+        public static string PasswordHash {
+            get {
+                return ResourceManager.GetString("PasswordHash", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 手機號碼驗證狀態 的當地語系化字串。
+        /// </summary>
+        public static string PhoneConfirmed {
+            get {
+                return ResourceManager.GetString("PhoneConfirmed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 手機號碼 的當地語系化字串。
+        /// </summary>
+        public static string PhoneNumber {
+            get {
+                return ResourceManager.GetString("PhoneNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 基本資料識別碼 的當地語系化字串。
+        /// </summary>
+        public static string ProfileId {
+            get {
+                return ResourceManager.GetString("ProfileId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 提供者鍵值 的當地語系化字串。
+        /// </summary>
+        public static string ProviderKey {
+            get {
+                return ResourceManager.GetString("ProviderKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 密碼重設權杖 的當地語系化字串。
+        /// </summary>
+        public static string ResetPasswordToken {
+            get {
+                return ResourceManager.GetString("ResetPasswordToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   查詢類似 角色名稱 的當地語系化字串。
         /// </summary>
         public static string RoleName {
             get {
                 return ResourceManager.GetString("RoleName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 安全戳記 的當地語系化字串。
+        /// </summary>
+        public static string SecurityStamp {
+            get {
+                return ResourceManager.GetString("SecurityStamp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 兩步驟驗證 的當地語系化字串。
+        /// </summary>
+        public static string TwoFactorEnabled {
+            get {
+                return ResourceManager.GetString("TwoFactorEnabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   查詢類似 網路位址 的當地語系化字串。
+        /// </summary>
+        public static string URL {
+            get {
+                return ResourceManager.GetString("URL", resourceCulture);
             }
         }
         

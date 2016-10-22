@@ -17,6 +17,7 @@ namespace My.Core.Infrastructures.Implementations.Models
         
         [StringLength(50, ErrorMessage="欄位長度不得大於 50 個字元")]
         [Required]
+        [Display(Name = "GroupName", ResourceType = typeof(ReslangMUI.MUI))]
         public string Name { get; set; }
         [Required]
         [UIHint("VoidDisplay")]

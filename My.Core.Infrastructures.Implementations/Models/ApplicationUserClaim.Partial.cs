@@ -9,7 +9,7 @@ namespace My.Core.Infrastructures.Implementations.Models
     public partial class ApplicationUserClaim
     {
     }
-    
+
     public partial class ApplicationUserClaimMetaData
     {
         [Display(Name = "UserName", ResourceType = typeof(ReslangMUI.MUI))]
@@ -20,11 +20,13 @@ namespace My.Core.Infrastructures.Implementations.Models
         [Required]
         [UIHint("UserIDMappingDisplay")]
         public int Id { get; set; }
-        
-        [StringLength(256, ErrorMessage="欄位長度不得大於 256 個字元")]
+        [Display(Name = "ClaimType", ResourceType = typeof(ReslangMUI.MUI))]
+        [StringLength(256, ErrorMessage = "欄位長度不得大於 256 個字元")]
         public string ClaimType { get; set; }
+
+        [Display(Name = "ClaimValue", ResourceType = typeof(ReslangMUI.MUI))]
         public string ClaimValue { get; set; }
-    
+
         public virtual ApplicationUser ApplicationUser { get; set; }
     }
 }
